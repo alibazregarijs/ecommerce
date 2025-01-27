@@ -10,7 +10,7 @@ const Navbar = () => {
     <nav>
       <div className="flex justify-center items-center mt-6">
         <div className="flex justify-center items-center">
-          <h1 className=" font-extrabold text-3xl">SHOP.CO</h1>
+          <h1 className="font-extrabold text-3xl">SHOP.CO</h1>
         </div>
         <div className="flex justify-center items-center mx-10 space-x-4">
           <span className=" text-[16px]">Shop</span>
