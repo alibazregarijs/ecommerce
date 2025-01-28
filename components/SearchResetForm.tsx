@@ -3,7 +3,7 @@ import React from "react";
 import { CloseCircle } from "iconsax-react";
 import Link from "next/link";
 
-const SearchResetForm = () => {
+const SearchResetForm = ({ query, onReset }: { query: string; onReset: () => void }) => {
   const handleResetFormFunc = () => {
     const form = document.getElementById("search-form") as HTMLFormElement;
     if (form) {
@@ -16,7 +16,7 @@ const SearchResetForm = () => {
       onClick={handleResetFormFunc}
     >
       <Link href="/" id="btnSubmit" type="reset">
-        <CloseCircle size="20" color="black" />
+        <CloseCircle onClick={handleResetFormFunc} size="20" color="black" />
       </Link>
     </div>
   );
