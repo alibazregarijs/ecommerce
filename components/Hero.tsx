@@ -1,7 +1,8 @@
 import React from "react";
 import ListingProduct from "@/components/ListingProduct";
 import DifferentDress from "@/components/DifferentDress";
-import Slider from "./Slider";
+import Slider from "@/components/Slider";
+import UpToDate from "@/components/UpToDate";
 const Hero = () => {
   const slides = [
     {
@@ -47,6 +48,9 @@ const Hero = () => {
       </div>
       <div className="flex justify-center items-center mt-[80px]">
         <Slider slides={slides} />
+      </div>
+      <div className="flex justify-center items-center mt-[80px] w-full">
+        <UpToDate />
       </div>
     </div>
   );
