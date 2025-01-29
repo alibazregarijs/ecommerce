@@ -61,6 +61,12 @@ const Header = () => {
           width={1440}
           height={663}
         />
+        <div className="absolute inset-y-72 top-0 right-0 flex items-center">
+          <Image src="/big-vector.png" alt="logo" width={104} height={104} />
+        </div>
+        <div className="absolute inset-y-0 top-48 lg:left-0 lg:right-0 right-96  flex items-center">
+          <Image src="/big-vector.png" alt="logo" width={56} height={56} />
+        </div>
         <div className="flex lg:mx-12 absolute inset-y-0 right-0 left-4  items-center w-[577px]">
           <div className="flex  flex-col justify-center items-start space-y-8">
             <h1 className="font-extrabold md:text-[40px] lg:text-[60px] leading-none">
