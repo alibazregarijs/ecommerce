@@ -20,15 +20,15 @@ const Navbar = () => {
   };
   return (
     <nav>
-      <div className="sm:flex md:hidden flex-col justify-between items-center mt-6">
-        <div className="flex justify-around w-full items-center">
-          <div className="flex justify-center items-center space-x-4">
+      <div className="sm:flex md:hidden mx-2 flex-col justify-center items-center mt-6">
+        <div className="flex justify-between  w-full items-center">
+          <div className="flex justify-center items-center space-x-2">
             <HambergerMenu
               onClick={() => handleToggle({ type: "hamburger" })}
               size="24"
               color="#000"
             />
-            <h1 className="font-extrabold text-3xl">SHOP.CO </h1>
+            <h1 className="font-extrabold text-2xl">SHOP.CO </h1>
           </div>
           <div className="flex justify-center items-center space-x-3">
             <SearchNormal1
@@ -41,7 +41,7 @@ const Navbar = () => {
           </div>
         </div>
         {isOpen.hamburger && (
-          <div className="absolute top-[60px] mt-8 left-0 w-full bg-white shadow-md z-10">
+          <div className="absolute border top-[60px] mt-6 left-0 w-full bg-white shadow-md z-10">
             <div className="flex justify-center items-center space-x-10">
               <span className="text-[16px] text-black">Shop</span>
               <span className="text-[16px] text-black">On Sale</span>
@@ -61,7 +61,7 @@ const Navbar = () => {
       </div>
 
       {/* desktop  */}
-      <div className="md:flex hidden justify-center items-center  mt-6">
+      <div className="md:flex md:mx-4 hidden justify-center items-center  mt-6">
         <div className="flex justify-center items-center">
           <h1 className="font-extrabold text-3xl">SHOP.CO</h1>
         </div>
