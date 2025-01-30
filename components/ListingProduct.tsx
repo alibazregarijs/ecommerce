@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 
 const ListingProduct = ({ rating = 3.5 }) => {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center px-4">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
         {[
           { src: "/product/t-shirt1.png", price: 49.99, discount: 59.99 },

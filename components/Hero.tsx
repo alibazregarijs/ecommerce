@@ -51,9 +51,9 @@ const Hero = () => {
        <div className="flex justify-center w-full items-center mt-[80px]"> 
         <Slider slides={slides} />
       </div>
-      {/* <div className="flex justify-center items-center mt-[80px] w-full">
+      <div className="flex justify-center items-center mt-[80px] w-full">
         <UpToDate />
-      </div>  */}
+      </div> 
     </div>
   );
 };
