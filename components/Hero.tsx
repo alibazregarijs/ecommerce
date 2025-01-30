@@ -43,15 +43,17 @@ const Hero = () => {
       <div className="flex justify-center items-center space-x-4 mt-[56px]">
         <ListingProduct />
       </div>
-      <div className="flex justify-center rounded-[40px] mt-[80px] w-[1240px] h-[866px] bg-[#F0F0F0]">
+
+      <div className="flex justify-center lg:max-w-screen-xl md:max-w-screen-md rounded-[40px] w-full mt-[80px] bg-[#F0F0F0]">
         <DifferentDress />
       </div>
-      <div className="flex justify-center items-center mt-[80px]">
+
+      {/* <div className="flex justify-center items-center mt-[80px]">
         <Slider slides={slides} />
       </div>
       <div className="flex justify-center items-center mt-[80px] w-full">
         <UpToDate />
-      </div>
+      </div> */}
     </div>
   );
 };
