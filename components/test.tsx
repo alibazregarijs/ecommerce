@@ -3,18 +3,9 @@ import Image from "next/image";
 
 const Footer = () => {
   return (
-    <div className="grid grid-cols-2   lg:grid-cols-5 gap-[114px]  justify-center items-start mt-[80px] mx-10">
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-6 justify-center items-start mt-[80px] mx-10">
       {/* SHOP.CO Section - Full width */}
-      <div className="flex flex-col justify-center items-start  space-y-4 w-full col-span-2 sm:block md:hidden">
-        <h1 className="font-bold text-2xl">SHOP.CO</h1>
-        <p className="font-mono text-sm text-gray-500">
-          We have clothes that suit your style and which you’re proud to wear.
-          From women to men.
-        </p>
-        <Image src="/social.png" alt="social" width={130} height={130} />
-      </div>
-
-      <div className="hidden md:flex flex-col justify-center h-full items-start space-y-4 w-full">
+      <div className="flex flex-col justify-center items-start space-y-4 w-full col-span-2 md:col-span-5">
         <h1 className="font-bold text-2xl">SHOP.CO</h1>
         <p className="font-mono text-sm text-gray-500">
           We have clothes that suit your style and which you’re proud to wear.
@@ -24,7 +15,7 @@ const Footer = () => {
       </div>
 
       {/* COMPANY Section */}
-      <div className="flex flex-col  justify-center items-start space-y-4 w-full">
+      <div className="flex flex-col justify-center items-start space-y-4 w-full">
         <h3 className="font-extralight text-xl">COMPANY</h3>
         <p className="font-mono text-sm text-gray-500">About</p>
         <p className="font-mono text-sm text-gray-500">Features</p>
@@ -33,7 +24,7 @@ const Footer = () => {
       </div>
 
       {/* HELP Section */}
-      <div className="flex flex-col  justify-center items-start space-y-4 w-full">
+      <div className="flex flex-col justify-center items-start space-y-4 w-full">
         <h3 className="font-extralight text-xl">HELP</h3>
         <p className="font-mono text-sm text-gray-500">Customer Support</p>
         <p className="font-mono text-sm text-gray-500">Delivery Details</p>
@@ -42,7 +33,7 @@ const Footer = () => {
       </div>
 
       {/* RESOURCES Section */}
-      <div className="flex flex-col  justify-center items-start space-y-4 w-full">
+      <div className="flex flex-col justify-center items-start space-y-4 w-full">
         <h3 className="font-extralight text-xl">RESOURCES</h3>
         <p className="font-mono text-sm text-gray-500">Free eBooks</p>
         <p className="font-mono text-sm text-gray-500">Development Tutorial</p>
@@ -51,7 +42,7 @@ const Footer = () => {
       </div>
 
       {/* FAQ Section */}
-      <div className="flex flex-col  justify-center items-start space-y-4 w-full">
+      <div className="flex flex-col justify-center items-start space-y-4 w-full">
         <h3 className="font-extralight text-xl">FAQ</h3>
         <p className="font-mono text-sm text-gray-500">Account</p>
         <p className="font-mono text-sm text-gray-500">Manage Deliveries</p>
