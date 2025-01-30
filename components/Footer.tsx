@@ -14,7 +14,7 @@ const Footer = () => {
         <Image src="/social.png" alt="social" width={130} height={130} />
       </div>
 
-      <div className="hidden border md:flex flex-col justify-center h-full items-start space-y-4 w-full">
+      <div className="hidden md:flex flex-col justify-center h-full items-start space-y-4 w-full">
         <h1 className="font-bold text-2xl">SHOP.CO</h1>
         <p className="font-mono text-sm text-gray-500">
           We have clothes that suit your style and which you’re proud to wear.
