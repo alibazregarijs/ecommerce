@@ -5,13 +5,17 @@ import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import { getProducts } from "@/lib/actions/product";
 import {getRelatedProducts} from "@/lib/actions/product";
+import { auth } from "@/auth";
+
 
 const page = async () => {
 
   const products = await getProducts();
-  const relatedProducts = await getRelatedProducts(1 , 3);
+  const session = await auth();
+  const userId = session?.user?.id
+  const relatedProducts = await getRelatedProducts(3,Number(userId) ?? 0 );
 
-  console.log(relatedProducts)
+ 
 
   return (
     <>

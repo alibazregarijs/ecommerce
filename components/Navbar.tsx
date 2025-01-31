@@ -10,8 +10,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState({ hamburger: false, search: false });
 
   const handleToggle = ({ type }: { type: "hamburger" | "search" }) => {
-    console.log(type);
-    console.log(isOpen);
+
     setIsOpen(
       type === "hamburger"
         ? { hamburger: !isOpen.hamburger, search: false }

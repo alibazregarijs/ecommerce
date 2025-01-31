@@ -35,7 +35,6 @@ export const getProducts = async (): Promise<ProductProps[]> => {
   const minute = parts.find((part) => part.type === "minute")?.value ?? "00";
 
   const formattedDate = `${year}-${month}-${day} ${hour}:${minute}`;
-  console.log(formattedDate);
 
   const formattedProducts = productsWithDiscounts.map(
     (product: ProductProps) => {
@@ -71,10 +70,30 @@ export const getProducts = async (): Promise<ProductProps[]> => {
   return formattedProducts;
 };
 
-export async function getRelatedProducts(productId: number, limit: number = 10) {
+export async function getRelatedProducts(limit: number = 10, userId: number) {
+  console.log(userId, "userId");
+
+  // Get the last viewed product for the user
+  const lastProduct = await prisma.seenProduct.findFirst({
+    where: {
+      userId: userId,
+    },
+    orderBy: {
+      viewedAt: "desc",
+    },
+  });
+
+  console.log(lastProduct, "lastProduct");
+
   try {
+    // If no product was found for this user, return an empty array or handle it
+    if (!lastProduct) {
+      return [];
+    }
+
+    // Get the last product details along with categories
     const product = await prisma.product.findUnique({
-      where: { id: productId },
+      where: { id: lastProduct.productId },
       include: { categories: true }, // Include categories for related product search
     });
 
@@ -82,10 +101,11 @@ export async function getRelatedProducts(productId: number, limit: number = 10) 
       return null; // Or throw an error if the product doesn't exist
     }
 
+    // Try to fetch related products based on the current product
     const relatedProducts = await prisma.product.findMany({
       where: {
         AND: [
-          { id: { not: productId } }, // Exclude the current product
+          { id: { not: lastProduct.productId } }, // Exclude the current product
           {
             OR: [
               // 1. Products in the same categories
@@ -111,9 +131,56 @@ export async function getRelatedProducts(productId: number, limit: number = 10) 
       take: limit, // Limit the number of related products
     });
 
+    // If no related products are found, return the five most recent products
+    if (relatedProducts.length === 0) {
+      const fallbackProducts = await prisma.product.findMany({
+        orderBy: {
+          // Order by the most recently viewed products
+          createdAt: "asc",
+        },
+        take: 3, // Fetch the last 5 products
+      });
+      return fallbackProducts;
+    }
+
     return relatedProducts;
   } catch (error) {
     console.error("Error fetching related products:", error);
     throw error; // Re-throw the error for handling at a higher level
+  }
+}
+
+export async function createSeenProduct({
+  slug,
+  userId,
+}: {
+  slug: string;
+  userId: number;
+}) {
+  const product = await prisma.product.findUnique({
+    where: {
+      slug: slug,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  try {
+    const seenProduct = await prisma.seenProduct.create({
+      data: {
+        userId: userId || null, // Allow null for guest users
+        productId: product.id,
+      },
+    });
+
+    return seenProduct;
+  } catch (error) {
+    console.error("Error creating SeenProduct:", error);
+    throw error; // Handle error as needed
   }
 }
