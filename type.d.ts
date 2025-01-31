@@ -26,6 +26,6 @@ export interface ProductProps {
     endDate: Date | null;
     createdAt: Date;
   } | null;
-  isDiscountValid: boolean;
+  isDiscountValid?: boolean;
 }
 
