@@ -4,7 +4,7 @@ import DifferentDress from "@/components/DifferentDress";
 import Slider from "@/components/Slider";
 import UpToDate from "@/components/UpToDate";
 import { ProductProps } from "@/type";
-const Hero = ({products}: {products: ProductProps[]}) => {
+const Hero = ({products , relatedProducts}: {products: ProductProps[], relatedProducts: ProductProps[]}) => {
   const slides = [
     {
       id: 1,
@@ -42,7 +42,11 @@ const Hero = ({products}: {products: ProductProps[]}) => {
     <div className="flex flex-col justify-center items-center mt-[72px]">
       <h1 className="font-extrabold text-3xl">New Arrivals</h1>
       <div className="flex justify-center items-center space-x-4 mt-[56px]">
-        <ListingProduct products={products} />
+        <ListingProduct products={products}/>
+      </div>
+      <h1 className="font-extrabold text-3xl mt-16">You Might Also Like </h1>
+      <div className="flex justify-center items-center space-x-4 ">
+        <ListingProduct products={relatedProducts}/>
       </div>
 
       <div className="flex justify-center lg:max-w-screen-xl md:max-w-screen-md rounded-[40px] w-full mt-[80px] bg-[#F0F0F0]">

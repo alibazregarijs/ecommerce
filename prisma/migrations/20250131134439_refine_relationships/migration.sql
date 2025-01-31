@@ -49,8 +49,8 @@ CREATE TABLE "Category" (
 CREATE TABLE "Discount" (
     "id" SERIAL NOT NULL,
     "percentage" DOUBLE PRECISION,
-    "startDate" TEXT,
-    "endDate" TEXT,
+    "startDate" TIMESTAMP(3),
+    "endDate" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Discount_pkey" PRIMARY KEY ("id")

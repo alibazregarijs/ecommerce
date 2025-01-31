@@ -6,18 +6,27 @@ import { ProductProps } from "@/type";
 
 const ListingProduct = ({ products }: { products: ProductProps[] }) => {
   const rating = 3.5;
+
   return (
     <div className="flex flex-col items-center px-4">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
         {products.map((product, index) => (
           <div key={index} className="flex flex-col items-start">
-            <Image
-              src={product.image}
-              alt={product.name}
-              quality={100}
-              width={296}
-              height={298}
-            />
+            {/* Check if the product image is valid */}
+            {product?.image ? (
+              <Image
+                src={product.image}
+                alt={product.name}
+                quality={100}
+                width={296}
+                height={298}
+              />
+            ) : (
+              <div className="w-[296px] h-[298px] bg-gray-200 flex items-center justify-center">
+                <span className="text-gray-500">Image not available</span>
+              </div>
+            )}
+            
             <div className="flex flex-col mt-4">
               <h3 className="font-bold">{product.name}</h3>
               <div className="flex items-center space-x-4 mt-2">
@@ -36,13 +45,9 @@ const ListingProduct = ({ products }: { products: ProductProps[] }) => {
                   <div className="flex items-center space-x-4">
                     <h3 className="font-bold text-lg text-black/40 line-through">
                       $
-                      {Number.isInteger(
-                        product.discountedPrice ?? product.price
-                      )
+                      {Number.isInteger(product.discountedPrice ?? product.price)
                         ? `${product.discountedPrice ?? product.price}`
-                        : `${(product.discountedPrice ?? product.price).toFixed(
-                            2
-                          )}`}
+                        : `${(product.discountedPrice ?? product.price).toFixed(2)}`}
                     </h3>
                     <div className="bg-[#FF3333]/10 rounded-full px-3 py-1">
                       <h3 className="font-bold text-sm text-[#FF3333]">

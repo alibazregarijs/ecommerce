@@ -35,9 +35,7 @@ export const getProducts = async (): Promise<ProductProps[]> => {
   const minute = parts.find((part) => part.type === "minute")?.value ?? "00";
 
   const formattedDate = `${year}-${month}-${day} ${hour}:${minute}`;
-  console.log(formattedDate)
-
-  
+  console.log(formattedDate);
 
   const formattedProducts = productsWithDiscounts.map(
     (product: ProductProps) => {
@@ -49,7 +47,8 @@ export const getProducts = async (): Promise<ProductProps[]> => {
         const isWithinDateRange =
           (!product.discount.startDate ||
             product.discount.startDate <= new Date(formattedDate)) &&
-          (!product.discount.endDate || product.discount.endDate >= new Date(formattedDate));
+          (!product.discount.endDate ||
+            product.discount.endDate >= new Date(formattedDate));
 
         if (isWithinDateRange) {
           isDiscountValid = true;
@@ -71,3 +70,50 @@ export const getProducts = async (): Promise<ProductProps[]> => {
 
   return formattedProducts;
 };
+
+export async function getRelatedProducts(productId: number, limit: number = 10) {
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      include: { categories: true }, // Include categories for related product search
+    });
+
+    if (!product) {
+      return null; // Or throw an error if the product doesn't exist
+    }
+
+    const relatedProducts = await prisma.product.findMany({
+      where: {
+        AND: [
+          { id: { not: productId } }, // Exclude the current product
+          {
+            OR: [
+              // 1. Products in the same categories
+              {
+                categories: {
+                  some: {
+                    id: { in: product.categories.map((cat) => cat.id) },
+                  },
+                },
+              },
+              // 2. Products with similar names (you might need more sophisticated logic here)
+              {
+                name: {
+                  contains: product.name.split(" ")[0], // Example: Check if names share the first word
+                  mode: "insensitive",
+                },
+              },
+            ],
+          },
+        ],
+      },
+      include: { categories: true, discount: true }, // Include categories and discount info for related products
+      take: limit, // Limit the number of related products
+    });
+
+    return relatedProducts;
+  } catch (error) {
+    console.error("Error fetching related products:", error);
+    throw error; // Re-throw the error for handling at a higher level
+  }
+}

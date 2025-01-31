@@ -15,8 +15,9 @@ model User {
   createdAt  DateTime @default(now())
 
   // Relationships
-  orders     Order[]  
-  cart       Cart?    
+  orders     Order[]  // One-to-many relationship with Order
+  cart       Cart?    // One-to-one relationship with Cart
+  seenProducts SeenProduct[] // One-to-many relationship with SeenProduct
 }
 
 model Product {
@@ -35,16 +36,17 @@ model Product {
   discountedPrice Float?      // Optional discounted price
 
   // Relationships (all optional)
-  categories      Category[]  // Many-to-Many with Categories (optional)
-  orderItems      OrderItem[] // One-to-many with OrderItem (optional)
-  cartItems       CartItem[]  // One-to-many with CartItem (optional)
+  categories      Category[]  // Many-to-Many with Categories
+  orderItems      OrderItem[] // One-to-many with OrderItem
+  cartItems       CartItem[]  // One-to-many with CartItem
+  seenProducts    SeenProduct[] // One-to-many with SeenProduct
   discount        Discount?   @relation(fields: [discountId], references: [id]) // Optional one-to-one with Discount
 }
 
 model Category {
   id        Int       @id @default(autoincrement())
   name      String    @unique
-  products  Product[] 
+  products  Product[] // Many-to-many relationship with Products
 }
 
 model Discount {
@@ -55,7 +57,7 @@ model Discount {
   createdAt   DateTime  @default(now())
 
   // Relationships
-  products    Product[]
+  products    Product[] // Many-to-many relationship with Products
 }
 
 model Order {
@@ -67,7 +69,7 @@ model Order {
 
   // Relationships
   user       User       @relation(fields: [userId], references: [id])
-  items      OrderItem[]
+  items      OrderItem[] // One-to-many relationship with OrderItems
 }
 
 model OrderItem {
@@ -85,10 +87,10 @@ model OrderItem {
 model Cart {
   id       Int      @id @default(autoincrement())
   userId   Int      @unique
-  items    CartItem[]
+  items    CartItem[] // One-to-many relationship with CartItems
 
   // Relationships
-  user     User    @relation(fields: [userId], references: [id])
+  user     User    @relation(fields: [userId], references: [id]) // One-to-one relationship with User
 }
 
 model CartItem {
@@ -98,8 +100,20 @@ model CartItem {
   quantity   Int
 
   // Relationships
-  cart       Cart    @relation(fields: [cartId], references: [id])
-  product    Product @relation(fields: [productId], references: [id])
+  cart       Cart    @relation(fields: [cartId], references: [id]) // One-to-many relationship with Cart
+  product    Product @relation(fields: [productId], references: [id]) // One-to-many relationship with Product
+}
+
+model SeenProduct {
+  id        Int      @id @default(autoincrement()) // Unique ID for each viewed product
+  userId    Int?     // Nullable for guest users
+  productId Int      // Product being viewed
+  viewedAt  DateTime @default(now()) // Timestamp when the product was viewed
+
+  // Relationships
+  user      User?    @relation(fields: [userId], references: [id]) // Optional relation for guest views
+  product   Product  @relation(fields: [productId], references: [id]) // Required relation with Product
+
 }
 
 enum OrderStatus {
