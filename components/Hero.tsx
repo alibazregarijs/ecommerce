@@ -3,7 +3,8 @@ import ListingProduct from "@/components/ListingProduct";
 import DifferentDress from "@/components/DifferentDress";
 import Slider from "@/components/Slider";
 import UpToDate from "@/components/UpToDate";
-const Hero = () => {
+import { ProductProps } from "@/type";
+const Hero = ({products}: {products: ProductProps[]}) => {
   const slides = [
     {
       id: 1,
@@ -41,7 +42,7 @@ const Hero = () => {
     <div className="flex flex-col justify-center items-center mt-[72px]">
       <h1 className="font-extrabold text-3xl">New Arrivals</h1>
       <div className="flex justify-center items-center space-x-4 mt-[56px]">
-        <ListingProduct />
+        <ListingProduct products={products} />
       </div>
 
       <div className="flex justify-center lg:max-w-screen-xl md:max-w-screen-md rounded-[40px] w-full mt-[80px] bg-[#F0F0F0]">

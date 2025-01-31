@@ -4,3 +4,28 @@ interface AuthCredentials {
   password: string;
   confirmPassword: string;
 }
+
+export interface ProductProps {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  quantity: number;
+  inStock: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  size: string;
+  color: string;
+  image: string;
+  discountId: number | null;
+  discountedPrice: number | null;
+  discount?: {
+    id: number;
+    percentage: number | null;
+    startDate: Date | null;
+    endDate: Date | null;
+    createdAt: Date;
+  } | null;
+  isDiscountValid: boolean;
+}
+

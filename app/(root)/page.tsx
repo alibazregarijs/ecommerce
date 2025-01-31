@@ -2,14 +2,17 @@ import React from "react";
 import Navbar from "@/components/Navbar";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import DifferentDress from "@/components/DifferentDress";
 import Footer from "@/components/Footer";
-const page = () => {
+import { getProducts } from "@/lib/actions/product";
+const page = async () => {
+
+  const products = await getProducts();
+  console.log(products)
   return (
     <>
       <Navbar />
       <Header />
-      <Hero />
+      <Hero products={products} />
       <Footer/>
     </>
   );
