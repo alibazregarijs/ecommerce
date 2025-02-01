@@ -2,7 +2,7 @@ import React from "react";
 
 const StarIconSvg = ({i}:{i:number}) => {
   return (
-    <div>
+    <div className="cursor-pointer">
       <svg
         key={i}
         width="25"
