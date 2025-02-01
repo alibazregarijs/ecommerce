@@ -4,28 +4,20 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 // GET /api/product/:productId
-export async function GET(
-  req: Request,
-  context: { params: { productId?: string } } // Ensure params exists
-) {
+export async function GET(req: Request, context: { params?: { productId?: string } }) {
   try {
-    // Await params before accessing it
+    // Await the params object before accessing it
     const { params } = await context;
 
-    if (!params?.productId) {
-      return NextResponse.json(
-        { error: "Product ID is required" },
-        { status: 400 }
-      );
+    // Ensure params and productId exist
+    if (!params || !params?.productId) {
+      return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
     }
 
-    const productId = parseInt(params.productId);
-
+    // Parse productId as an integer
+    const productId = parseInt(params.productId, 10);
     if (isNaN(productId)) {
-      return NextResponse.json(
-        { error: "Invalid product ID" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid product ID" }, { status: 400 });
     }
 
     // Fetch the product including its ratings
@@ -36,6 +28,7 @@ export async function GET(
       },
     });
 
+    // Check if the product exists
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
@@ -47,12 +40,10 @@ export async function GET(
           product.ratings.length
         : 0;
 
+    // Return the product data with the calculated average rating
     return NextResponse.json({ ...product, averageRating }, { status: 200 });
   } catch (error) {
     console.error("Error fetching product:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
