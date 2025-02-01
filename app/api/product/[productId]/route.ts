@@ -9,9 +9,10 @@ export async function GET(
   context: { params: { productId?: string } } // Ensure params exists
 ) {
   try {
-    const { params } = context;
+    // Await params before accessing it
+    const { params } = await context;
 
-    if (!params || !params.productId) {
+    if (!params?.productId) {
       return NextResponse.json(
         { error: "Product ID is required" },
         { status: 400 }
