@@ -4,10 +4,10 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 // GET /api/product/:productId
-export async function GET(req: Request, context: { params?: { productId?: string } }) {
+export async function GET(req: Request, context: { params?: Promise<{ productId?: string }> }) {
   try {
     // Await the params object before accessing it
-    const { params } = await context;
+    const params = await context.params;
 
     // Ensure params and productId exist
     if (!params || !params?.productId) {
@@ -15,14 +15,14 @@ export async function GET(req: Request, context: { params?: { productId?: string
     }
 
     // Parse productId as an integer
-    const productId = parseInt(params.productId, 10);
-    if (isNaN(productId)) {
+    const productIdNum = parseInt(params.productId, 10);
+    if (isNaN(productIdNum)) {
       return NextResponse.json({ error: "Invalid product ID" }, { status: 400 });
     }
 
     // Fetch the product including its ratings
     const product = await prisma.product.findUnique({
-      where: { id: productId },
+      where: { id: productIdNum },
       include: {
         ratings: true, // Include ratings for calculating average
       },
