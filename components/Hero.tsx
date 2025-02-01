@@ -10,17 +10,18 @@ import { fetchProducts, fetchRelatedProducts } from "@/store/ProductSlice";
 
 const Hero = ({ userId }: { userId: string }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { mainProducts, relatedProducts, status } = useSelector(
-    (state: RootState) => state.products
-  );
+  const {
+    mainProducts,
+    relatedProducts,
+    mainProductsLoading,
+    relatedProductsLoading,
+  } = useSelector((state: RootState) => state.products);
 
   // Fetch main products and related products when the component mounts
   useEffect(() => {
-    if (status === "idle") {
-      dispatch(fetchProducts());
-      dispatch(fetchRelatedProducts(Number(userId)));
-    }
-  }, [dispatch, status, userId]);
+    dispatch(fetchProducts());
+    dispatch(fetchRelatedProducts(Number(userId)));
+  }, [dispatch, userId]);
 
   const slides = [
     {
@@ -60,11 +61,17 @@ const Hero = ({ userId }: { userId: string }) => {
     <div className="flex flex-col justify-center items-center mt-[72px]">
       <h1 className="font-extrabold text-3xl">New Arrivals</h1>
       <div className="flex justify-center items-center space-x-4 mt-[56px]">
-        <ListingProduct products={mainProducts} />
+        <ListingProduct
+          products={mainProducts}
+          loading={mainProductsLoading} // Pass main products loading state
+        />
       </div>
       <h1 className="font-extrabold text-3xl mt-16">You Might Also Like </h1>
       <div className="flex justify-center items-center space-x-4 ">
-        <ListingProduct products={relatedProducts} />
+        <ListingProduct
+          products={relatedProducts}
+          loading={relatedProductsLoading} // Pass related products loading state
+        />
       </div>
 
       <div className="flex justify-center lg:max-w-screen-xl md:max-w-screen-md rounded-[40px] w-full mt-[80px] bg-[#F0F0F0]">

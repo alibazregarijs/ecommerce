@@ -4,13 +4,20 @@ import Image from "next/image";
 import { renderStars } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { ProductProps } from "@/type";
+import Spinner from "./Spinner";
 
 const ListingProduct = ({
   products,
+  loading,
 }: {
   products: ProductProps[];
+  loading: boolean;
 }) => {
   const rating = 3.5;
+
+  if (loading) {
+    return <Spinner loading={true}/>;
+  }
 
   return (
     <div className="flex flex-col items-center px-4">

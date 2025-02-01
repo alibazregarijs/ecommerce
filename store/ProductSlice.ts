@@ -1,24 +1,24 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { type ProductProps } from "@/type";
-import { auth } from "@/auth";
 
 interface ProductState {
   mainProducts: ProductProps[]; // For the main products
   relatedProducts: ProductProps[]; // For the related products
-  status: "idle" | "loading" | "succeeded" | "failed";
+  mainProductsLoading: boolean; // Loading state for main products
+  relatedProductsLoading: boolean; // Loading state for related products
   error: string | null;
 }
 
 const initialState: ProductState = {
   mainProducts: [],
   relatedProducts: [],
-  status: "idle",
+  mainProductsLoading: false,
+  relatedProductsLoading: false,
   error: null,
 };
 
-
-// Async thunk to fetch todos
+// Async thunk to fetch main products
 export const fetchProducts = createAsyncThunk(
   "product/fetchProducts",
   async () => {
@@ -29,10 +29,10 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
+// Async thunk to fetch related products
 export const fetchRelatedProducts = createAsyncThunk(
   "product/fetchRelatedProducts",
   async (userId: number) => {
-   
     const relatedProducts = await axios.post<ProductProps[]>(
       "/api/product/related",
       { userId, limit: 3 }
@@ -49,33 +49,35 @@ const productsSlice = createSlice({
     builder
       // Fetch Main Products
       .addCase(fetchProducts.pending, (state) => {
-        state.status = "loading";
+        state.mainProductsLoading = true; // Set loading state for main products
+        state.error = null;
       })
       .addCase(
         fetchProducts.fulfilled,
         (state, action: PayloadAction<ProductProps[]>) => {
-          state.status = "succeeded";
+          state.mainProductsLoading = false; // Reset loading state for main products
           state.mainProducts = action.payload; // Store main products
         }
       )
       .addCase(fetchProducts.rejected, (state, action) => {
-        state.status = "failed";
+        state.mainProductsLoading = false; // Reset loading state for main products
         state.error = action.error.message || "Failed to fetch products";
       })
 
       // Fetch Related Products
       .addCase(fetchRelatedProducts.pending, (state) => {
-        state.status = "loading";
+        state.relatedProductsLoading = true; // Set loading state for related products
+        state.error = null;
       })
       .addCase(
         fetchRelatedProducts.fulfilled,
         (state, action: PayloadAction<ProductProps[]>) => {
-          state.status = "succeeded";
+          state.relatedProductsLoading = false; // Reset loading state for related products
           state.relatedProducts = action.payload; // Store related products
         }
       )
       .addCase(fetchRelatedProducts.rejected, (state, action) => {
-        state.status = "failed";
+        state.relatedProductsLoading = false; // Reset loading state for related products
         state.error = action.error.message || "Failed to fetch related products";
       });
   },
