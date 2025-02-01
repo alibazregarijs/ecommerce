@@ -1,10 +1,15 @@
+"use client";
 import React from "react";
 import Image from "next/image";
 import { renderStars } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { ProductProps } from "@/type";
 
-const ListingProduct = ({ products }: { products: ProductProps[] }) => {
+const ListingProduct = ({
+  products,
+}: {
+  products: ProductProps[];
+}) => {
   const rating = 3.5;
 
   return (
@@ -26,7 +31,7 @@ const ListingProduct = ({ products }: { products: ProductProps[] }) => {
                 <span className="text-gray-500">Image not available</span>
               </div>
             )}
-            
+
             <div className="flex flex-col mt-4">
               <h3 className="font-bold">{product.name}</h3>
               <div className="flex items-center space-x-4 mt-2">
@@ -45,9 +50,13 @@ const ListingProduct = ({ products }: { products: ProductProps[] }) => {
                   <div className="flex items-center space-x-4">
                     <h3 className="font-bold text-lg text-black/40 line-through">
                       $
-                      {Number.isInteger(product.discountedPrice ?? product.price)
+                      {Number.isInteger(
+                        product.discountedPrice ?? product.price
+                      )
                         ? `${product.discountedPrice ?? product.price}`
-                        : `${(product.discountedPrice ?? product.price).toFixed(2)}`}
+                        : `${(product.discountedPrice ?? product.price).toFixed(
+                            2
+                          )}`}
                     </h3>
                     <div className="bg-[#FF3333]/10 rounded-full px-3 py-1">
                       <h3 className="font-bold text-sm text-[#FF3333]">

@@ -1,10 +1,27 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
 import ListingProduct from "@/components/ListingProduct";
 import DifferentDress from "@/components/DifferentDress";
 import Slider from "@/components/Slider";
 import UpToDate from "@/components/UpToDate";
-import { ProductProps } from "@/type";
-const Hero = ({products , relatedProducts}: {products: ProductProps[], relatedProducts: ProductProps[]}) => {
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store/store";
+import { fetchProducts, fetchRelatedProducts } from "@/store/ProductSlice";
+
+const Hero = ({ userId }: { userId: string }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { mainProducts, relatedProducts, status } = useSelector(
+    (state: RootState) => state.products
+  );
+
+  // Fetch main products and related products when the component mounts
+  useEffect(() => {
+    if (status === "idle") {
+      dispatch(fetchProducts());
+      dispatch(fetchRelatedProducts(Number(userId)));
+    }
+  }, [dispatch, status, userId]);
+
   const slides = [
     {
       id: 1,
@@ -38,27 +55,28 @@ const Hero = ({products , relatedProducts}: {products: ProductProps[], relatedPr
       rating: 2,
     },
   ];
+
   return (
     <div className="flex flex-col justify-center items-center mt-[72px]">
       <h1 className="font-extrabold text-3xl">New Arrivals</h1>
       <div className="flex justify-center items-center space-x-4 mt-[56px]">
-        <ListingProduct products={products}/>
+        <ListingProduct products={mainProducts} />
       </div>
       <h1 className="font-extrabold text-3xl mt-16">You Might Also Like </h1>
       <div className="flex justify-center items-center space-x-4 ">
-        <ListingProduct products={relatedProducts}/>
+        <ListingProduct products={relatedProducts} />
       </div>
 
       <div className="flex justify-center lg:max-w-screen-xl md:max-w-screen-md rounded-[40px] w-full mt-[80px] bg-[#F0F0F0]">
         <DifferentDress />
       </div>
 
-       <div className="flex justify-center w-full items-center mt-[80px]"> 
+      <div className="flex justify-center w-full items-center mt-[80px]">
         <Slider slides={slides} />
       </div>
       <div className="flex justify-center items-center mt-[80px] w-full">
         <UpToDate />
-      </div> 
+      </div>
     </div>
   );
 };
