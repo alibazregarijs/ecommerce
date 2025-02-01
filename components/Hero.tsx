@@ -17,6 +17,8 @@ const Hero = ({ userId }: { userId: string }) => {
     relatedProductsLoading,
   } = useSelector((state: RootState) => state.products);
 
+  console.log(mainProducts,"mainProductsLoading");
+
   // Fetch main products and related products when the component mounts
   useEffect(() => {
     dispatch(fetchProducts());
@@ -62,6 +64,7 @@ const Hero = ({ userId }: { userId: string }) => {
       <h1 className="font-extrabold text-3xl">New Arrivals</h1>
       <div className="flex justify-center items-center space-x-4 mt-[56px]">
         <ListingProduct
+          userId={Number(userId)}
           products={mainProducts}
           loading={mainProductsLoading} // Pass main products loading state
         />
@@ -69,6 +72,7 @@ const Hero = ({ userId }: { userId: string }) => {
       <h1 className="font-extrabold text-3xl mt-16">You Might Also Like </h1>
       <div className="flex justify-center items-center space-x-4 ">
         <ListingProduct
+        userId={Number(userId)}
           products={relatedProducts}
           loading={relatedProductsLoading} // Pass related products loading state
         />

@@ -3,21 +3,35 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "postgresql" // Use the provider for your database, like "postgresql", "mysql", etc.
+  url      = env("DATABASE_URL") // The URL of your database, usually provided in an environment variable
 }
 
 model User {
+  id          Int        @id @default(autoincrement())
+  fullName    String
+  email       String     @unique
+  password    String
+  createdAt   DateTime   @default(now())
+
+  // Relationships
+  orders      Order[]    // One-to-many relationship with Order
+  cart        Cart?      // One-to-one relationship with Cart
+  seenProducts SeenProduct[] // One-to-many relationship with SeenProduct
+  ratings     Rating[]   // One-to-many relationship with Rating (added)
+}
+
+model Rating {
   id         Int      @id @default(autoincrement())
-  fullName   String
-  email      String   @unique
-  password   String
+  userId     Int
+  productId  Int
+  rating     Int      // Rating value (e.g., 1 to 5)
   createdAt  DateTime @default(now())
 
   // Relationships
-  orders     Order[]  // One-to-many relationship with Order
-  cart       Cart?    // One-to-one relationship with Cart
-  seenProducts SeenProduct[] // One-to-many relationship with SeenProduct
+  user       User     @relation(fields: [userId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id])
+  @@unique([userId, productId])
 }
 
 model Product {
@@ -36,12 +50,13 @@ model Product {
   discountId      Int?        // Optional foreign key for Discount
   discountedPrice Float?      // Optional discounted price
 
-  // Relationships (all optional)
+  // Relationships
   categories      Category[]  // Many-to-Many with Categories
   orderItems      OrderItem[] // One-to-many with OrderItem
   cartItems       CartItem[]  // One-to-many with CartItem
   seenProducts    SeenProduct[] // One-to-many with SeenProduct
   discount        Discount?   @relation(fields: [discountId], references: [id]) // Optional one-to-one with Discount
+  ratings         Rating[]    // One-to-many with Rating (added)
 }
 
 model Category {
@@ -114,11 +129,7 @@ model SeenProduct {
   // Relationships
   user      User?    @relation(fields: [userId], references: [id]) // Optional relation for guest views
   product   Product  @relation(fields: [productId], references: [id]) // Required relation with Product
-
 }
-
-
-
 
 enum OrderStatus {
   PENDING

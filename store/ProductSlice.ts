@@ -22,9 +22,8 @@ const initialState: ProductState = {
 export const fetchProducts = createAsyncThunk(
   "product/fetchProducts",
   async () => {
-    console.log("Fetching products from API...");
+    console.log("fetching products")
     const response = await axios.get<ProductProps[]>("/api/product/all");
-    console.log(response.data, "Products fetched from API");
     return response.data;
   }
 );
@@ -38,6 +37,29 @@ export const fetchRelatedProducts = createAsyncThunk(
       { userId, limit: 3 }
     );
     return relatedProducts.data;
+  }
+);
+
+// Async thunk to update product rating
+export const updateProductRating = createAsyncThunk(
+  "product/updateProductRating",
+  async ({
+    productId,
+    rating,
+    userId,
+  }: {
+    productId: number;
+    rating: number;
+    userId: number;
+  }) => {
+    await axios.put(`/api/product/update/${productId}`, {
+      productId,
+      rating,
+      userId,
+    });
+    const response = await axios.get<ProductProps>(`/api/product/${productId}`);
+
+    return response.data; // Return updated product data
   }
 );
 
@@ -78,7 +100,29 @@ const productsSlice = createSlice({
       )
       .addCase(fetchRelatedProducts.rejected, (state, action) => {
         state.relatedProductsLoading = false; // Reset loading state for related products
-        state.error = action.error.message || "Failed to fetch related products";
+        state.error =
+          action.error.message || "Failed to fetch related products";
+      })
+
+      // Update Product Rating
+      .addCase(updateProductRating.pending, (state) => {
+        state.error = null; // Reset error state on rating update
+      })
+      .addCase(updateProductRating.fulfilled, (state, action) => {
+        const updatedProduct = action.payload; // The updated product from the API
+      
+        // Update in mainProducts
+        state.mainProducts = state.mainProducts.map((product) =>
+          product.id === updatedProduct.id ? updatedProduct : product
+        );
+      
+        // Update in relatedProducts
+        state.relatedProducts = state.relatedProducts.map((product) =>
+          product.id === updatedProduct.id ? updatedProduct : product
+        );
+      })
+      .addCase(updateProductRating.rejected, (state, action) => {
+        state.error = action.error.message || "Failed to update rating"; // Set error if rating update fails
       });
   },
 });

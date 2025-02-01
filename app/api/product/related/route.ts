@@ -3,12 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
-    console.log("salam")
-    console.log("Fetching related products...");
+ 
 
     // Parse the request body
     const { userId, limit = 5 } = await req.json();
-    console.log("Received userId:", userId);
 
     // Validate userId
     if (!userId) {
@@ -22,11 +20,9 @@ export async function POST(req: NextRequest) {
       orderBy: { viewedAt: "desc" },
     });
 
-    console.log("Last viewed product:", lastProduct);
 
     // If no last product found, return an empty array
     if (!lastProduct) {
-      console.log("No last product found for userId:", userId);
       return NextResponse.json([], { status: 200 });
     }
 
@@ -36,7 +32,6 @@ export async function POST(req: NextRequest) {
       include: { categories: true },
     });
 
-    console.log("Product details:", product);
 
     // If the product doesn't exist, return a 404 error
     if (!product) {
@@ -74,11 +69,9 @@ export async function POST(req: NextRequest) {
       take: limit,
     });
 
-    console.log("Related products:", relatedProducts);
 
     // If no related products, return fallback products
     if (relatedProducts.length === 0) {
-      console.log("No related products found, returning fallback products");
       const fallbackProducts = await prisma.product.findMany({
         orderBy: { createdAt: "asc" },
         take: 3,

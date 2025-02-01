@@ -3,11 +3,13 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
   try {
-    const productsWithDiscounts = await prisma.product.findMany({
-      include: { discount: true },
+    const productsWithDiscountsAndRatings = await prisma.product.findMany({
+      include: {
+        discount: true,
+        ratings: true, // Include ratings for calculating the average rating
+      },
     });
 
-    // Get current date in Iran's timezone (Asia/Tehran)
     const currentDate = new Date();
     const formatter = new Intl.DateTimeFormat("en-GB", {
       timeZone: "Asia/Tehran",
@@ -29,7 +31,7 @@ export async function GET(req: NextRequest) {
       parts.find((p) => p.type === "minute")?.value ?? "00"
     }`;
 
-    const formattedProducts = productsWithDiscounts.map((product) => {
+    const formattedProducts = productsWithDiscountsAndRatings.map((product) => {
       let finalPrice = product.price;
       let isDiscountValid = false;
 
@@ -49,11 +51,22 @@ export async function GET(req: NextRequest) {
         }
       }
 
+      // Calculate average rating
+      const totalRatings = product.ratings.reduce(
+        (sum, rating) => sum + rating.rating,
+        0
+      );
+      const averageRating =
+        product.ratings.length > 0
+          ? totalRatings / product.ratings.length
+          : null;
+
       return {
         ...product,
         originalPrice: product.price,
         discountedPrice: isDiscountValid ? finalPrice : product.price,
         isDiscountValid,
+        averageRating, // Include average rating
       };
     });
 

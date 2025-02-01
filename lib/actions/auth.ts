@@ -49,7 +49,7 @@ export const signUp = async (params: AuthCredentials) => {
     },
   });
 
-  console.log(existingUser,"existingUser")
+  
 
   if (existingUser) {
     return { success: false, error: "User already exists" };

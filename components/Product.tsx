@@ -5,20 +5,25 @@ import { type ProductProps } from "@/type";
 import { renderStars } from "@/lib/utils";
 import { AiFillStar } from "react-icons/ai";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store/store";
+import { updateProductRating } from "@/store/ProductSlice";
 
-const Product = ({ product }: { product: ProductProps }) => {
+const Product = ({ product , userId }: { product: ProductProps , userId: number }) => {
   const [open, setOpen] = useState(false);
   const [selectedRating, setSelectedRating] = useState(0); // Track selected rating
+  const dispatch = useDispatch<AppDispatch>();
+
 
   // Handle star click
   const handleStarClick = (rating: number) => {
-    console.log("User clicked rating:", rating); // You can log it or handle the rating
     setSelectedRating(rating); // Update the selected rating
     setOpen(false); // Close the dialog
+    dispatch(updateProductRating({ productId: product.id, rating , userId })); // Update the rating
   };
 
-  const rating = 3.5; // You can set this dynamically or based on the product data
+
+  console.log("re-render product")
 
   return (
     <div className="flex flex-col items-start">
@@ -57,9 +62,9 @@ const Product = ({ product }: { product: ProductProps }) => {
         </div>
         <div className="flex items-center space-x-4 mt-2">
           <div className="flex gap-2">
-            {renderStars({ rating: rating, onClick: handleStarClick })}
+            {renderStars({ rating: product.averageRating || 0, onClick: handleStarClick })}
           </div>
-          <p className="text-sm">{rating}/5</p>
+          <p className="text-sm">{product.averageRating || 0}/5</p>
         </div>
         <div className="flex items-center space-x-4 mt-2">
           <h3 className="font-bold text-lg">

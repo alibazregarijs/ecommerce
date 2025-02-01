@@ -17,6 +17,7 @@ export interface ProductProps {
   size: string;
   color: string;
   image: string;
+  rating: number;
   discountId: number | null;
   discountedPrice: number | null;
   discount?: {
@@ -27,5 +28,6 @@ export interface ProductProps {
     createdAt: Date;
   } | null;
   isDiscountValid?: boolean;
+  averageRating?: number | null;
 }
 
