@@ -62,7 +62,7 @@ const Product = ({ product , userId }: { product: ProductProps , userId: number 
         </div>
         <div className="flex items-center space-x-4 mt-2">
           <div className="flex gap-2">
-            {renderStars({ rating: product.averageRating || 0, onClick: handleStarClick })}
+            {renderStars({ rating: product.averageRating || 0, onClick: handleStarClick , empty: true })}
           </div>
           <p className="text-sm">{product.averageRating || 0}/5</p>
         </div>

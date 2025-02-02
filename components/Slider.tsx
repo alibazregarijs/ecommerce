@@ -80,7 +80,7 @@ const Slider = ({ slides }: { slides: any[] }) => {
             <SwiperSlide key={index}>
               <div className="flex flex-col justify-between min-h-[240px] h-[240px] p-10 space-y-2 items-start border rounded-[20px] overflow-hidden">
                 <div className="flex justify-center items-center">
-                  {renderStars({ rating: slide.rating })}
+                  {renderStars({ rating: slide.rating, onClick: () => {} })}
                 </div>
                 <div className="flex justify-center items-start space-x-1">
                   <p className="font-bold text-md">{slide.name}</p>
