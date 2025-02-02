@@ -2,12 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
+  const limit = req.nextUrl.searchParams.get('limit'); // Get limit from query params
+    const limitNumber = limit ? parseInt(limit) : 4;
   try {
     const productsWithDiscountsAndRatings = await prisma.product.findMany({
       include: {
         discount: true,
         ratings: true, // Include ratings for calculating the average rating
       },
+      take: limitNumber,
     });
 
     const currentDate = new Date();

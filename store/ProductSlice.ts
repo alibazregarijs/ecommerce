@@ -21,6 +21,7 @@ const initialState: ProductState = {
 // Fetch main products
 export const fetchProducts = createAsyncThunk("product/fetchProducts", async () => {
   const response = await axios.get<ProductProps[]>("/api/product/all");
+  console.log(response.data,"in")
   return response.data;
 });
 
@@ -32,6 +33,7 @@ export const fetchRelatedProducts = createAsyncThunk(
       "/api/product/related",
       { userId, limit: 3 }
     );
+    console.log(relatedProducts.data,"relatedProductssssssssssssssssss")
     return relatedProducts.data;
   }
 );

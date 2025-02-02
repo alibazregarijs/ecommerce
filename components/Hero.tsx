@@ -7,6 +7,7 @@ import UpToDate from "@/components/UpToDate";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import { fetchProducts, fetchRelatedProducts } from "@/store/ProductSlice";
+import Spinner from "@/components/Spinner";
 
 const Hero = ({ userId }: { userId: string }) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -17,7 +18,7 @@ const Hero = ({ userId }: { userId: string }) => {
     relatedProductsLoading,
   } = useSelector((state: RootState) => state.products);
 
-  console.log(mainProducts,"mainProductsLoading");
+  console.log(mainProducts, "mainProductsLoading");
 
   // Fetch main products and related products when the component mounts
   useEffect(() => {
@@ -61,22 +62,34 @@ const Hero = ({ userId }: { userId: string }) => {
 
   return (
     <div className="flex flex-col justify-center items-center mt-[72px]">
-      <h1 className="font-extrabold text-3xl">New Arrivals</h1>
-      <div className="flex justify-center items-center space-x-4 mt-[56px]">
-        <ListingProduct
-          userId={Number(userId)}
-          products={mainProducts}
-          loading={mainProductsLoading} // Pass main products loading state
-        />
-      </div>
-      <h1 className="font-extrabold text-3xl mt-16">You Might Also Like </h1>
-      <div className="flex justify-center items-center space-x-4 ">
-        <ListingProduct
-        userId={Number(userId)}
-          products={relatedProducts}
-          loading={relatedProductsLoading} // Pass related products loading state
-        />
-      </div>
+      {mainProductsLoading ? (
+        <div className="flex justify-center items-center space-x-4 mt-[56px]">
+          <Spinner loading={true} />
+        </div>
+      ) : (
+        <div className="flex flex-col justify-center items-center space-x-4 mt-[56px]">
+          <h1 className="font-extrabold text-3xl">New Arrivals</h1>
+          <ListingProduct
+            userId={Number(userId)}
+            products={mainProducts}
+   
+          />
+        </div>
+      )}
+      {relatedProductsLoading ? (
+        <div className="flex justify-center items-center space-x-4 mt-[56px]">
+          <Spinner loading={true} />
+        </div>
+      ) : (
+        <div className="flex flex-col justify-center items-center space-x-4 mt-[56px]">
+          <h1 className="font-extrabold text-3xl mt-16">You Might Also Like </h1>
+          <ListingProduct
+            userId={Number(userId)}
+            products={relatedProducts}
+        
+          />
+        </div>
+      )}
 
       <div className="flex justify-center lg:max-w-screen-xl md:max-w-screen-md rounded-[40px] w-full mt-[80px] bg-[#F0F0F0]">
         <DifferentDress />

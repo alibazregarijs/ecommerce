@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { renderStars } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { ProductProps } from "@/type";
 import Spinner from "./Spinner";
@@ -9,19 +8,11 @@ import Product from "./Product";
 
 const ListingProduct = ({
   products,
-  loading,
-  userId
+  userId,
 }: {
   products: ProductProps[];
-  loading: boolean;
   userId: number;
 }) => {
-  const rating = 3.5;
-
-  if (loading) {
-    return <Spinner loading={true} />;
-  }
-
   return (
     <div className="flex flex-col items-center px-4">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mt-12">

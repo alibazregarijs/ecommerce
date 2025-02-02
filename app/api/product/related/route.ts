@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import axios from "axios";
+import { ProductProps } from "@/type";
 
 export async function POST(req: NextRequest) {
   try {
- 
-
     // Parse the request body
     const { userId, limit = 5 } = await req.json();
 
@@ -20,11 +20,13 @@ export async function POST(req: NextRequest) {
       orderBy: { viewedAt: "desc" },
     });
 
-
     // If no last product found, return an empty array
     if (!lastProduct) {
-      return NextResponse.json([], { status: 200 });
+      const fetchProducts = await axios.get<ProductProps[]>("http://localhost:3000/api/product/all?limit=3");
+      console.log("Fetched Products:", fetchProducts.data);
+      return NextResponse.json(fetchProducts.data, { status: 200 });
     }
+    
 
     // Get the last product details along with categories
     const product = await prisma.product.findUnique({
@@ -32,12 +34,13 @@ export async function POST(req: NextRequest) {
       include: { categories: true },
     });
 
-
     // If the product doesn't exist, return a 404 error
     if (!product) {
-      console.error("Product not found for productId:", lastProduct.productId);
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
+
+    console.log("Last Product Categories:", product.categories);
+    console.log("Product Name:", product.name);
 
     // Fetch related products based on the current product
     const relatedProducts = await prisma.product.findMany({
@@ -69,16 +72,9 @@ export async function POST(req: NextRequest) {
       take: limit,
     });
 
+    console.log("Related Products:", relatedProducts);
 
     // If no related products, return fallback products
-    if (relatedProducts.length === 0) {
-      const fallbackProducts = await prisma.product.findMany({
-        orderBy: { createdAt: "asc" },
-        take: 3,
-        include: { categories: true, discount: true }, // Include categories and discount for consistency
-      });
-      return NextResponse.json(fallbackProducts, { status: 200 });
-    }
 
     // Return the related products
     return NextResponse.json(relatedProducts, { status: 200 });
