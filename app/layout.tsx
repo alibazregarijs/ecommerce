@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import ClientReduxProvider from "@/app/ClientReduxProvider";
+import Navbar from "@/components/Navbar"; // Import Navbar
+import Footer from "@/components/Footer"; // Import Footer
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,9 +32,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Toaster />
-        <main>
-          <ClientReduxProvider>{children}</ClientReduxProvider>
-        </main>
+        <ClientReduxProvider>
+          <Navbar /> {/* Navbar at the top */}
+          <main>{children}</main>
+          <Footer /> {/* Footer at the bottom */}
+        </ClientReduxProvider>
       </body>
     </html>
   );
