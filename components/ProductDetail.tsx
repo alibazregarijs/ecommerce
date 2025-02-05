@@ -1,8 +1,11 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import { renderStars } from "@/lib/utils";
+import Product from "@/components/Product";
+import { ProductProps } from "@/type";
 
-const ProductDetail = () => {
+const ProductDetail = ({product}:{product:ProductProps}) => {
   return (
     <section>
       <div className="grid mx-16 md:grid-cols-12 gap-2 grid-cols-1 md:grid-rows-3 md:gap-4">
@@ -49,7 +52,7 @@ const ProductDetail = () => {
           />
         </div>
         <div className="md:col-span-6 col-span-12 md:order-3 order-3">
-          Right Div
+           <Product product={product} productDetail={true} userId={2} />
         </div>
       </div>
     </section>

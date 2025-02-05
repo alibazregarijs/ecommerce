@@ -40,3 +40,15 @@ export async function createSeenProduct({
     throw error; // Handle error as needed
   }
 }
+
+export const getProductDetails = async (slug: string) => {
+  const product = await prisma.product.findUnique({
+    where: {
+      slug,
+    },
+  });
+
+  return product;
+}
+
+

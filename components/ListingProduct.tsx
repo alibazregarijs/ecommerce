@@ -12,7 +12,7 @@ const ListingProduct = React.memo(({ products, userId, setViewAll }: {
     <div className="flex flex-col items-center px-4">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
         {products.map((product, index) => (
-          <Product userId={userId} key={index} product={product} />
+          <Product userId={userId} productDetail={false} key={index} product={product} />
         ))}
       </div>
       <div className="mt-10">
