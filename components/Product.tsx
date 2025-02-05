@@ -68,7 +68,7 @@ const Product = ({
 
       <div className={`flex flex-col ${productDetail ? "w-full" : "mt-4"}`}>
         <div className="flex items-center justify-between w-full space-x-4">
-          <h3 className={`font-bold ${productDetail && "text-4xl font-extrabold"}`}>
+          <h3 className={`font-bold  ${productDetail && "text-xl lg:text-3xl font-extrabold"}`}>
             {productDetail && "THE BEST "}
             {
               productDetail
