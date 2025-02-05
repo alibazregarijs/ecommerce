@@ -1,17 +1,12 @@
-"use client";
 import React from "react";
-import Image from "next/image";
 import { Button } from "./ui/button";
 import { ProductProps } from "@/type";
-import Spinner from "./Spinner";
 import Product from "./Product";
 
-const ListingProduct = ({
-  products,
-  userId,
-}: {
+const ListingProduct = React.memo(({ products, userId, setViewAll }: {
   products: ProductProps[];
   userId: number;
+  setViewAll: React.Dispatch<React.SetStateAction<number>>;
 }) => {
   return (
     <div className="flex flex-col items-center px-4">
@@ -21,13 +16,13 @@ const ListingProduct = ({
         ))}
       </div>
       <div className="mt-10">
-        <Button className="bg-black text-white hover:bg-white hover:text-black">
+        <Button onClick={() => setViewAll(8)} className="bg-black text-white hover:bg-white hover:text-black">
           View All
         </Button>
       </div>
       <div className="border w-full mt-10"></div>
     </div>
   );
-};
+});
 
 export default ListingProduct;

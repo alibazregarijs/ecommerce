@@ -19,21 +19,19 @@ const initialState: ProductState = {
 };
 
 // Fetch main products
-export const fetchProducts = createAsyncThunk("product/fetchProducts", async () => {
-  const response = await axios.get<ProductProps[]>("/api/product/all");
-  console.log(response.data,"in")
+export const fetchProducts = createAsyncThunk("product/fetchProducts", async (limit: number) => {
+  const response = await axios.get<ProductProps[]>(`/api/product/all?limit=${limit}`);
   return response.data;
 });
 
 // Fetch related products
 export const fetchRelatedProducts = createAsyncThunk(
   "product/fetchRelatedProducts",
-  async (userId: number) => {
+  async ({ userId, limit }: { userId: number; limit: number }) => {
     const relatedProducts = await axios.post<ProductProps[]>(
       "/api/product/related",
-      { userId, limit: 3 }
+      { userId, limit }
     );
-    console.log(relatedProducts.data,"relatedProductssssssssssssssssss")
     return relatedProducts.data;
   }
 );

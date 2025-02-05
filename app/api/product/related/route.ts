@@ -6,7 +6,7 @@ import { ProductProps } from "@/type";
 export async function POST(req: NextRequest) {
   try {
     // Parse the request body
-    const { userId, limit = 5 } = await req.json();
+    const { userId, limit = 4 } = await req.json();
 
     // Validate userId
     if (!userId) {
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
     // If no last product found, return an empty array
     if (!lastProduct) {
-      const fetchProducts = await axios.get<ProductProps[]>("http://localhost:3000/api/product/all?limit=3");
+      const fetchProducts = await axios.get<ProductProps[]>(`http://localhost:3000/api/product/all?limit=${limit}`);
       console.log("Fetched Products:", fetchProducts.data);
       return NextResponse.json(fetchProducts.data, { status: 200 });
     }
