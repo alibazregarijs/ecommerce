@@ -44,20 +44,21 @@ model Product {
   inStock         Boolean     @default(true)
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
-  size            Size        @default(M)
+  sizes           Size[]      // Array of available sizes
   color           Color       @default(BROWN)
-  image           String
+  images          String[]    // Store multiple image URLs as an array
   discountId      Int?        // Optional foreign key for Discount
   discountedPrice Float?      // Optional discounted price
 
   // Relationships
-  categories      Category[]  // Many-to-Many with Categories
-  orderItems      OrderItem[] // One-to-many with OrderItem
-  cartItems       CartItem[]  // One-to-many with CartItem
-  seenProducts    SeenProduct[] // One-to-many with SeenProduct
-  discount        Discount?   @relation(fields: [discountId], references: [id]) // Optional one-to-one with Discount
-  ratings         Rating[]    // One-to-many with Rating (added)
+  categories      Category[]  
+  orderItems      OrderItem[] 
+  cartItems       CartItem[]  
+  seenProducts    SeenProduct[] 
+  discount        Discount?   @relation(fields: [discountId], references: [id]) 
+  ratings         Rating[]    
 }
+
 
 model Category {
   id        Int       @id @default(autoincrement())

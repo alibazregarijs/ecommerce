@@ -37,8 +37,6 @@ const Product = ({
     dispatch(updateProductRating({ productId: product.id, rating, userId })); // Update the rating
   };
 
-  console.log("re-render product");
-
   return (
     <div className={`flex flex-col items-start w-full `}>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -56,9 +54,9 @@ const Product = ({
         </DialogContent>
       </Dialog>
 
-      {product?.image && !productDetail ? (
+      {product?.images && !productDetail ? (
         <Image
-          src={product.image}
+          src={product.images[0] || "/fallback-image.png"} // Provide a default image
           alt={product.name}
           quality={100}
           width={296}
@@ -68,7 +66,11 @@ const Product = ({
 
       <div className={`flex flex-col ${productDetail ? "w-full" : "mt-4"}`}>
         <div className="flex items-center justify-between w-full space-x-4">
-          <h3 className={`font-bold  ${productDetail && "text-xl lg:text-3xl font-extrabold"}`}>
+          <h3
+            className={`font-bold  ${
+              productDetail && "text-xl lg:text-3xl font-extrabold"
+            }`}
+          >
             {productDetail && "THE BEST "}
             {
               productDetail

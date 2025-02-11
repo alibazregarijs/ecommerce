@@ -16,8 +16,9 @@ export interface ProductProps {
   updatedAt: Date;
   size: string;
   color: string;
-  image: string;
+  images: string[];
   rating: number;
+  slug: string;
   discountId: number | null;
   discountedPrice: number | null;
   discount?: {
