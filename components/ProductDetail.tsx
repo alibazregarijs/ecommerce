@@ -124,6 +124,7 @@ const ProductDetail = ({
                 productId={product.id.toString()}
                 image={selectedImage}
                 quantity={initialQuantity}
+                size={selectedSize}
                 title={product.name}
                 price={product.price}
                 quantityInStore={product.quantity}

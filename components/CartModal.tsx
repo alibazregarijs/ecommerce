@@ -44,7 +44,10 @@ const CartModal = ({
           </Badge>
           <ScrollArea className="h-[300px] pr-4">
             {cart.map((item) => (
-              <Card key={item.id} className="mb-4 bg-gray-900 text-white">
+              <Card
+                key={`${item.id}-${item.size}`} // Ensure unique key for different sizes
+                className="mb-4 bg-gray-900 text-white"
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-4">
                     <div className="relative w-16 h-16 rounded-md overflow-hidden">
@@ -58,6 +61,9 @@ const CartModal = ({
                     <div className="flex-1">
                       <h3 className="font-semibold">{item.title}</h3>
                       <p className="text-sm text-gray-400">
+                        Size: <span className="font-bold">{item.size}</span>
+                      </p>
+                      <p className="text-sm text-gray-400">
                         ${item.price.toFixed(2)}
                       </p>
                     </div>
@@ -66,7 +72,9 @@ const CartModal = ({
                         variant="outline"
                         size="icon"
                         className="w-8 h-8 text-white border-white"
-                        onClick={() => dispatch(removeFromCart(item.id))}
+                        onClick={() =>
+                          dispatch(removeFromCart({ id: item.id, size: item.size }))
+                        }
                       >
                         <Minus className="w-4 h-4" />
                       </Button>
@@ -75,13 +83,17 @@ const CartModal = ({
                         variant="outline"
                         size="icon"
                         className="w-8 h-8 text-white border-white"
-                        disabled={item.quantityInStore === 0 || item.quantityInStore < item.quantity+1}
-                        onClick={() => 
+                        disabled={
+                          item.quantityInStore === 0 ||
+                          item.quantityInStore < item.quantity + 1
+                        }
+                        onClick={() =>
                           dispatch(
                             addToCart({
                               id: item.id,
                               img: item.img,
                               title: item.title,
+                              size: item.size, // Include size when updating cart
                               price: item.price,
                               quantityInStore: item.quantityInStore,
                               slug: item.slug,

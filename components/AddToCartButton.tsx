@@ -11,6 +11,7 @@ interface AddToCartButtonProps {
   image: string;
   quantity: number;
   title: string;
+  size: string;
   price: number;
   quantityInStore: number;
   slug: string;
@@ -19,6 +20,7 @@ interface AddToCartButtonProps {
 const AddToCartButton = ({
   productId,
   image,
+  size,
   quantity,
   title,
   price,
@@ -27,18 +29,22 @@ const AddToCartButton = ({
 }: AddToCartButtonProps) => {
   const dispatch = useDispatch();
 
-  const cart = useCartSelector((state) => 
-    state.cart.items.find((item) => item.id === productId) // Use find() to get a single item
+  const cart = useCartSelector((state) =>
+    state.cart.items.find((item) => item.id === productId && item.size === size) // Match size too
   );
-  
+
   const handleAddToCart = () => {
     let correctQuantityMessage = "";
-    let sumOfQuantities = (cart?.quantity || 0) + quantity; // Use optional chaining
-  
+    let sumOfQuantities = (cart?.quantity || 0) + quantity; // Include size-specific quantity
+
     if (quantity <= 0) {
       correctQuantityMessage = "Please enter a valid quantity.";
     }
-    if (quantity > quantityInStore || quantityInStore === 0 || sumOfQuantities > quantityInStore) {
+    if (
+      quantity > quantityInStore ||
+      quantityInStore === 0 ||
+      sumOfQuantities > quantityInStore
+    ) {
       correctQuantityMessage = "Sorry, this product is out of stock.";
     }
     if (correctQuantityMessage) {
@@ -49,20 +55,20 @@ const AddToCartButton = ({
       });
       return; // Prevent adding to cart if there's an error
     }
-  
+
     dispatch(
       addToCart({
         id: productId,
         img: image,
         quantity,
         title,
+        size, // Include size when adding to cart
         price,
         quantityInStore,
         slug,
       })
     );
   };
-  
 
   return (
     <Button
