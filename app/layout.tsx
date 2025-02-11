@@ -33,9 +33,9 @@ export default function RootLayout({
       >
         <Toaster />
         <ClientReduxProvider>
-          <Navbar /> {/* Navbar at the top */}
+          <Navbar />
           <main>{children}</main>
-          <Footer /> {/* Footer at the bottom */}
+          {/* <Footer /> Footer at the bottom */}
         </ClientReduxProvider>
       </body>
     </html>

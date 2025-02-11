@@ -5,12 +5,14 @@ import { ShoppingCart } from "iconsax-react";
 import { ProfileCircle } from "iconsax-react";
 import { HambergerMenu } from "iconsax-react";
 import { SearchNormal1 } from "iconsax-react";
+import CartModal from "@/components/CartModal";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState({ hamburger: false, search: false });
 
-  const handleToggle = ({ type }: { type: "hamburger" | "search" }) => {
+  const [shoppingCartClicked, setShoppingCartClicked] = useState(false);
 
+  const handleToggle = ({ type }: { type: "hamburger" | "search" }) => {
     setIsOpen(
       type === "hamburger"
         ? { hamburger: !isOpen.hamburger, search: false }
@@ -35,8 +37,8 @@ const Navbar = () => {
               size="24"
               color="#000"
             />
-            <ShoppingCart size="24" color="#000" />
-            <ProfileCircle size="24" color="#000" />
+            <ShoppingCart  className="cursor-pointer" size="24" color="#000" />
+            <ProfileCircle className="cursor-pointer"  size="24" color="#000" />
           </div>
         </div>
         {isOpen.hamburger && (
@@ -74,11 +76,13 @@ const Navbar = () => {
           <Searchbox />
         </div>
         <div className="flex justify-center items-center mx-10 space-x-4">
-          <ShoppingCart size="24" color="#000" />
-          <ProfileCircle size="24" color="#000" />
+          <ShoppingCart onClick={() => setShoppingCartClicked((prev)=>!prev)}  className="cursor-pointer" size="24" color="#000" />
+          <ProfileCircle className="cursor-pointer" size="24" color="#000" />
         </div>
       </div>
+      {shoppingCartClicked && <CartModal  shoppingCartClicked={shoppingCartClicked} setShoppingCartClicked={setShoppingCartClicked} />}
     </nav>
+
   );
 };
 

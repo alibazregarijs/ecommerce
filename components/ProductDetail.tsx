@@ -34,6 +34,8 @@ const ProductDetail = ({
     return `${pathname}?${params.toString()}`;
   };
 
+  console.log(initialQuantity,"initialQuantity")
+
   return (
     <section>
       <div className="grid mx-16 md:grid-cols-12 gap-2 grid-cols-1 md:grid-rows-3 md:gap-4">
