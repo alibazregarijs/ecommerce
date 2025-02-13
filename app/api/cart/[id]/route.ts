@@ -27,6 +27,7 @@ export async function GET(request: Request, props: { params: Promise<{ id: strin
                 name: true,
                 price: true,
                 images: true,
+                description:true
               },
             },
           },

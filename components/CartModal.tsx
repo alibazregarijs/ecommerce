@@ -17,19 +17,6 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 
-type cartItemProps = {
-  id: number;
-  cartId: number;
-  productId: number;
-  quantity: number;
-  size: string;
-  product: {
-    id: number;
-    name: string;
-    price: number;
-    images: string[];
-  };
-};
 
 const CartModal = ({
   shoppingCartClicked,
@@ -53,14 +40,18 @@ const CartModal = ({
     dispatch(fetchCartItems(userId as string));
   }, [shoppingCartClicked, userId, dispatch]);
 
-  const handleRemoveItem = async (productId: number, size: string) => {
+  console.log(cart,"cart")
+
+  const handleRemoveItem = async (productId: number, size: string , type:string) => {
     console.log(productId, size, "productId size");
     try {
-      await dispatch(updateCartItem({ userId, productId, size })).unwrap();
+      console.log(type,"cartmodel ")
+      await dispatch(updateCartItem({ userId, productId, size , type })).unwrap();
+      
       toast({
-        title: "Removed",
-        description: "Item removed from cart.",
-        className: "bg-red-500 text-white",
+        title: type === "remove" ? "Removed" : "Added",
+        description: type === "remove" ? "Item removed from cart." : "Item added to cart.",
+        className: type === "remove" ? "bg-red-500 text-white" : "bg-green-500 text-white",
       });
     } catch (error) {
       toast({
@@ -71,41 +62,41 @@ const CartModal = ({
     }
   };
 
-  const handleAddItem = async (item: any) => {
-    console.log(item,'item')
-    if (item.quantity >= item.quantityInStore) {
-      toast({
-        title: "Error",
-        description: "Not enough stock available.",
-        className: "bg-red-500 text-white",
-      });
-      return;
-    }
+  // const handleAddItem = async (item: CartItem) => {
+  //   console.log(item,'item')
+  //   if (item.quantity >= item.quantityInStore) {
+  //     toast({
+  //       title: "Error",
+  //       description: "Not enough stock available.",
+  //       className: "bg-red-500 text-white",
+  //     });
+  //     return;
+  //   }
 
-    try {
-      await dispatch(
-        addCartItem({
-          userId: Number(userId),
-          productId: item.product.id,
-          size: item.size,
-          quantity: item.quantity+1,
-          quantityInStore: item.quantityInStore,
-        })
-      ).unwrap();
+  //   try {
+  //     await dispatch(
+  //       addCartItem({
+  //         userId: Number(userId),
+  //         productId: item.product.id.toString(),
+  //         size: item.size,
+  //         quantity: item.quantity+1,
+  //         quantityInStore: item.quantityInStore,
+  //       })
+  //     ).unwrap();
 
-      toast({
-        title: "Success",
-        description: `${item.title} (${item.size}) quantity updated.`,
-        className: "bg-green-500 text-white",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error as string,
-        className: "bg-red-500 text-white",
-      });
-    }
-  };
+  //     toast({
+  //       title: "Success",
+  //       description: `${item.product.name} (${item.size}) quantity updated.`,
+  //       className: "bg-green-500 text-white",
+  //     });
+  //   } catch (error) {
+  //     toast({
+  //       title: "Error",
+  //       description: error as string,
+  //       className: "bg-red-500 text-white",
+  //     });
+  //   }
+  // };
 
   return (
     <Dialog open={shoppingCartClicked} onOpenChange={setShoppingCartClicked}>
@@ -150,6 +141,7 @@ const CartModal = ({
                         <p className="text-sm text-gray-400">
                           ${item.product.price.toFixed(2)}
                         </p>
+                       
                       </div>
                       <div className="flex items-center space-x-2">
                         <Button
@@ -157,7 +149,7 @@ const CartModal = ({
                           size="icon"
                           className="w-8 h-8 text-white border-white"
                           onClick={() =>
-                            handleRemoveItem(item.productId, item.size)
+                            handleRemoveItem(item.productId, item.size, "remove")
                           }
                         >
                           <Minus className="w-4 h-4" />
@@ -168,7 +160,9 @@ const CartModal = ({
                           size="icon"
                           className="w-8 h-8 text-white border-white"
                           disabled={item.quantity >= item.quantityInStore}
-                          onClick={() => handleAddItem(item)}
+                          onClick={() =>
+                            handleRemoveItem(item.productId, item.size, "add")
+                          }
                         >
                           <Plus className="w-4 h-4" />
                         </Button>

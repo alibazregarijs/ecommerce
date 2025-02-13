@@ -5,78 +5,70 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
-    console.log("Processing add to cart...");
-    
-    const { userId, productId, quantity, size }: { 
-      userId: number; 
-      productId: number; 
-      quantity: number; 
-      size: string 
-    } = await req.json();
+    const {
+      userId,
+      productId,
+      quantity,
+      size,
+    }: { userId: number; productId: number; quantity: number; size: string } =
+      await req.json();
 
-    console.log("Received data:", { userId, productId, quantity, size });
+      console.log(userId, "userId", productId, "productId", quantity, "quantity", size, "size",quantity,"quantity");
 
     let cart = await prisma.cart.findFirst({
       where: { userId },
-      include: { items: { include: { product: true } } },
+      include: { items: { include: { product: true } } }, // Include product details
     });
 
     let cartItem;
 
     if (!cart) {
-      console.log("Cart not found, creating new cart...");
-      
+      // If the cart doesn't exist, create one and add the item
       cart = await prisma.cart.create({
         data: {
           userId,
           items: {
             create: [
               {
-                productId,
+                productId: Number(productId),
                 size: size as Size,
-                quantity: 1,
+                quantity: Number(quantity),
               },
             ],
           },
         },
-        include: { items: { include: { product: true } } },
+        include: { items: { include: { product: true } } }, // Include product details
       });
 
       cartItem = cart.items.find(
-        (item) => item.productId === productId && item.size === size
+        (item) => item.productId === Number(productId) && item.size === size
       );
     } else {
-      console.log("Cart exists, checking for item...");
-
+      // Find if the item already exists in the cart
       cartItem = cart.items.find(
-        (item) => item.productId === productId && item.size === size
+        (item) => item.productId === Number(productId) && item.size === size
       );
 
       if (cartItem) {
-        console.log("Item found, updating quantity...");
-
+        // Update existing cart item
         cartItem = await prisma.cartItem.update({
           where: { id: cartItem.id },
-          data: { quantity: cartItem.quantity + 1 }, // Increment by 1
-          include: { product: true },
+          data: { quantity: cartItem.quantity + Number(quantity) },
+          include: { product: true }, // Include product details
         });
-
       } else {
-        console.log("Item not found, creating new cart item...");
-
+        // Create a new cart item
         cartItem = await prisma.cartItem.create({
           data: {
             cartId: cart.id,
-            productId,
+            productId: Number(productId),
             size: size as Size,
-            quantity: 1,
+            quantity: Number(quantity),
           },
-          include: { product: true },
+          include: { product: true }, // Include product details
         });
       }
     }
-
-    console.log("Updated cart item quantity:", cartItem?.quantity);
 
     return NextResponse.json({
       id: cartItem?.id,
@@ -84,13 +76,12 @@ export async function POST(req: Request) {
       size: cartItem?.size,
       quantity: cartItem?.quantity,
       product: {
-        id: cartItem?.product.id,
+        id:
         name: cartItem?.product.name,
         price: cartItem?.product.price,
         images: cartItem?.product.images,
       },
     });
-
   } catch (error) {
     console.error("Error adding item to cart:", error);
     return NextResponse.json(

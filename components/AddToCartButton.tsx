@@ -5,40 +5,32 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { addCartItem, fetchCartItems } from "@/store/CartSlice";
 import { useEffect } from "react";
+import { type CartItem } from "@/type";
 
-interface AddToCartButtonProps {
-  productId: string;
-  image: string;
-  quantity: number;
-  title: string;
-  size: string;
-  price: number;
-  quantityInStore: number;
-  slug: string;
-  userId: number;
-}
 
 const AddToCartButton = ({
   productId,
-  image,
+
   size,
   quantity,
   title,
-  price,
+
   quantityInStore,
-  slug,
+
   userId,
-}: AddToCartButtonProps) => {
+}: CartItem) => {
   const dispatch = useCartDispatch();
 
   // Get the cart item for this specific product & size
   const cartItem = useCartSelector((state) =>
-    state.cart.items.find((item) => item.id === Number(productId) && item.size === size)
+    state.cart.items.find(
+      (item) => item.id === Number(productId) && item.size === size
+    )
   );
 
-  useEffect(()=>{
-    dispatch(fetchCartItems(userId.toString()))
-  },[dispatch])
+  useEffect(() => {
+    dispatch(fetchCartItems(userId.toString()));
+  }, [dispatch]);
 
   const handleAddToCart = async () => {
     let errorMessage = "";
@@ -65,8 +57,8 @@ const AddToCartButton = ({
           quantity,
           size,
           userId,
-          productId,
-          quantityInStore
+          productId: productId.toString(),
+          quantityInStore,
         })
       ).unwrap(); // Ensures error handling in async thunk
 

@@ -1,23 +1,11 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
+import { type CartItem } from "@/type";
 
 const API_BASE_URL = "api/cart/add"; // Adjust based on your backend
 
 // Define the CartItem type
-export type CartItem = {
-  id: number;
-  cartId: number;
-  productId: number;
-  quantity: number;
-  quantityInStore: number;
-  size: string;
-  product: {
-    id: string;
-    name: string;
-    price: number;
-    images: string[];
-  };
-};
+
 // Define the CartState type
 type CartState = {
   items: CartItem[];
@@ -73,7 +61,7 @@ export const addCartItem = createAsyncThunk(
         userId,
         productId,
         size,
-        quantity: 1, // Always increment by 1
+        quantity: quantity, // Always increment by 1
         quantityInStore,
       });
 
@@ -94,15 +82,17 @@ export const updateCartItem = createAsyncThunk(
       userId,
       productId,
       size,
-    }: { userId: string; productId: number; size: string },
+      type,
+    }: { userId: string; productId: number; size: string , type:string },
     { rejectWithValue }
   ) => {
-    console.log("okkkk");
-    console.log(productId, "product in slice");
+    console.log(userId, "userId", productId, "productId", size, "size",type,"type","cartslice");
     try {
       const updatedCart = await axios.put(`/api/cart/update/${userId}`, {
+        userId,
         productId,
         size,
+        type
       });
       return updatedCart.data;
     } catch (error) {
@@ -193,18 +183,24 @@ export const cartSlice = createSlice({
         ) => {
           const payload = action.payload;
           if (!payload) return; // Ensure payload exists before updating state
-
-          const existingItem = state.items.find(
+      
+          const existingItemIndex = state.items.findIndex(
             (item) =>
               item.productId === Number(payload.productId) &&
               item.size === payload.size
           );
-
-          if (existingItem) {
-            existingItem.quantity = payload.quantity;
+      
+          if (existingItemIndex !== -1) {
+            if (payload.quantity > 0) {
+              state.items[existingItemIndex].quantity = payload.quantity;
+            } else {
+              // Remove item from the array if quantity is 0
+              state.items.splice(existingItemIndex, 1);
+            }
           }
         }
       )
+      
 
       // Clear Cart
       .addCase(clearCartThunk.fulfilled, (state) => {

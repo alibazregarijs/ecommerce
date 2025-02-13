@@ -16,7 +16,11 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import { updateProductRating } from "@/store/ProductSlice";
-import { useCartSelector, useProductDispatch, useProductSelector } from "@/store/hook";
+import {
+  useCartSelector,
+  useProductDispatch,
+  useProductSelector,
+} from "@/store/hook";
 
 const Product = ({
   product,
@@ -29,14 +33,16 @@ const Product = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [selectedRating, setSelectedRating] = useState(0); // Track selected rating
-  const dispatch = useProductDispatch()
-  const [myProd , setMyProd] = useState(product)
+  const dispatch = useProductDispatch();
+  const [myProd, setMyProd] = useState(product);
 
   // Handle star click
   const handleStarClick = async (rating: number) => {
     setSelectedRating(rating); // Update the selected rating
     setOpen(false); // Close the dialog
-    const result = await dispatch(updateProductRating({ productId: product.id, rating, userId })); // Update the rating
+    const result = await dispatch(
+      updateProductRating({ productId: product.id, rating, userId })
+    ); // Update the rating
     if (result.payload) {
       setMyProd(result.payload as ProductProps);
     }
@@ -123,6 +129,11 @@ const Product = ({
             </div>
           )}
         </div>
+        {productDetail && (
+          <div className="flex mt-4">
+            <p className="text-sm text-gray-400">{myProd.description}</p>
+          </div>
+        )}
       </div>
     </div>
   );

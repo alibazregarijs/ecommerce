@@ -32,3 +32,23 @@ export interface ProductProps {
   averageRating?: number | null;
 }
 
+export type CartItem = {
+  id?: number; // Optional because it's not needed when adding a new item
+  cartId?: number; // Optional for newly added items
+  productId: number;
+  quantity: number;
+  quantityInStore: number;
+  title?: string; // Optional for newly added items
+  size: string;
+  product: {
+    id: number;
+    name: string;
+    price: number;
+    images: string[];
+    description: string;
+  };
+  userId: number;
+  slug: string;
+};
+
+
