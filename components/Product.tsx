@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { type ProductProps } from "@/type";
 import { renderStars } from "@/lib/utils";
@@ -16,6 +16,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import { updateProductRating } from "@/store/ProductSlice";
+import { useCartSelector, useProductDispatch, useProductSelector } from "@/store/hook";
 
 const Product = ({
   product,
@@ -28,13 +29,17 @@ const Product = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [selectedRating, setSelectedRating] = useState(0); // Track selected rating
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useProductDispatch()
+  const [myProd , setMyProd] = useState(product)
 
   // Handle star click
-  const handleStarClick = (rating: number) => {
+  const handleStarClick = async (rating: number) => {
     setSelectedRating(rating); // Update the selected rating
     setOpen(false); // Close the dialog
-    dispatch(updateProductRating({ productId: product.id, rating, userId })); // Update the rating
+    const result = await dispatch(updateProductRating({ productId: product.id, rating, userId })); // Update the rating
+    if (result.payload) {
+      setMyProd(result.payload as ProductProps);
+    }
   };
 
   return (
@@ -54,10 +59,10 @@ const Product = ({
         </DialogContent>
       </Dialog>
 
-      {product?.images && !productDetail ? (
+      {myProd?.images && !productDetail ? (
         <Image
-          src={product.images[0] || "/fallback-image.png"} // Provide a default image
-          alt={product.name}
+          src={myProd.images[0] || "/fallback-image.png"} // Provide a default image
+          alt={myProd.name}
           quality={100}
           width={296}
           height={298}
@@ -74,8 +79,8 @@ const Product = ({
             {productDetail && "THE BEST "}
             {
               productDetail
-                ? product.name.toUpperCase() // Capitalize the whole name
-                : product.name.charAt(0).toUpperCase() + product.name.slice(1) // Capitalize only the first letter
+                ? myProd.name.toUpperCase() // Capitalize the whole name
+                : myProd.name.charAt(0).toUpperCase() + myProd.name.slice(1) // Capitalize only the first letter
             }
             {productDetail && " FOR YOU"}
           </h3>
@@ -89,30 +94,30 @@ const Product = ({
         <div className="flex items-center space-x-4 mt-2">
           <div className="flex gap-2">
             {renderStars({
-              rating: product.averageRating || 0,
+              rating: myProd.averageRating || 0,
               onClick: handleStarClick,
               empty: true,
             })}
           </div>
-          <p className="text-sm">{product.averageRating || 0}/5</p>
+          <p className="text-sm">{myProd.averageRating || 0}/5</p>
         </div>
         <div className="flex items-center space-x-4 mt-2">
           <h3 className="font-bold text-lg">
-            {Number.isInteger(product.price)
-              ? `$${product.price}`
-              : `$${product.price.toFixed(2)}`}
+            {Number.isInteger(myProd.price)
+              ? `$${myProd.price}`
+              : `$${myProd.price.toFixed(2)}`}
           </h3>
-          {product.isDiscountValid && (
+          {myProd.isDiscountValid && (
             <div className="flex items-center space-x-4">
               <h3 className="font-bold text-lg text-black/40 line-through">
                 $
-                {Number.isInteger(product.discountedPrice ?? product.price)
-                  ? `${product.discountedPrice ?? product.price}`
-                  : `${(product.discountedPrice ?? product.price).toFixed(2)}`}
+                {Number.isInteger(myProd.discountedPrice ?? myProd.price)
+                  ? `${myProd.discountedPrice ?? myProd.price}`
+                  : `${(myProd.discountedPrice ?? myProd.price).toFixed(2)}`}
               </h3>
               <div className="bg-[#FF3333]/10 rounded-full px-3 py-1">
                 <h3 className="font-bold text-sm text-[#FF3333]">
-                  -{product.discount?.percentage}%
+                  -{myProd.discount?.percentage}%
                 </h3>
               </div>
             </div>

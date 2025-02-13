@@ -40,6 +40,7 @@ export const fetchRelatedProducts = createAsyncThunk(
 export const updateProductRating = createAsyncThunk(
   "product/updateProductRating",
   async ({ productId, rating, userId }: { productId: number; rating: number; userId: number }) => {
+    console.log(rating,"rattttt")
     await axios.put(`/api/product/update/${productId}`, { productId, rating, userId });
     const response = await axios.get<ProductProps>(`/api/product/${productId}`);
     return response.data; // Return updated product data
@@ -93,16 +94,19 @@ const productsSlice = createSlice({
       })
       .addCase(updateProductRating.fulfilled, (state, action) => {
         const updatedProduct = action.payload;
+        console.log(updatedProduct,"updatedProduct")
 
         // Update in mainProducts
         state.mainProducts = state.mainProducts.map((product) =>
           product.id === updatedProduct.id ? updatedProduct : product
         );
 
+        console.log(state.mainProducts,"mainProducts")
         // Update in relatedProducts
         state.relatedProducts = state.relatedProducts.map((product) =>
           product.id === updatedProduct.id ? updatedProduct : product
         );
+        console.log(state.relatedProducts,"relatedProducts")
       })
       .addCase(updateProductRating.rejected, (state, action) => {
         state.error = action.error.message || "Failed to update rating"; // Set error if rating update fails

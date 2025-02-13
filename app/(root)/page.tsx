@@ -10,12 +10,13 @@ const page = async () => {
   const session = await auth();
   const userId = session?.user?.id;
 
+
   return (
     <>
-      <Navbar />
+      
       <Header />
       <Hero  userId={userId as string} />
-      <Footer />
+   
     </>
   );
 };

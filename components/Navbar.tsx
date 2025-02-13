@@ -7,10 +7,12 @@ import { HambergerMenu } from "iconsax-react";
 import { SearchNormal1 } from "iconsax-react";
 import CartModal from "@/components/CartModal";
 
-const Navbar = () => {
+const Navbar = ({userId}:{userId:string}) => {
   const [isOpen, setIsOpen] = useState({ hamburger: false, search: false });
 
   const [shoppingCartClicked, setShoppingCartClicked] = useState(false);
+
+  console.log(userId,"in navbar")
 
   const handleToggle = ({ type }: { type: "hamburger" | "search" }) => {
     setIsOpen(
@@ -80,7 +82,7 @@ const Navbar = () => {
           <ProfileCircle className="cursor-pointer" size="24" color="#000" />
         </div>
       </div>
-      {shoppingCartClicked && <CartModal  shoppingCartClicked={shoppingCartClicked} setShoppingCartClicked={setShoppingCartClicked} />}
+      {shoppingCartClicked && <CartModal userId={userId} shoppingCartClicked={shoppingCartClicked} setShoppingCartClicked={setShoppingCartClicked} />}
     </nav>
 
   );

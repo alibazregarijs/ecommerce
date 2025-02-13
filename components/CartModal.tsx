@@ -1,5 +1,8 @@
 import Image from "next/image";
+import { useEffect } from "react";
+
 import { useCartSelector, useCartDispatch } from "@/store/hook";
+import { fetchCartItems, addCartItem, updateCartItem } from "@/store/CartSlice";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,108 +15,172 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { addToCart, removeFromCart } from "@/store/CartSlice";
+import { toast } from "@/hooks/use-toast";
+
+type cartItemProps = {
+  id: number;
+  cartId: number;
+  productId: number;
+  quantity: number;
+  size: string;
+  product: {
+    id: number;
+    name: string;
+    price: number;
+    images: string[];
+  };
+};
 
 const CartModal = ({
   shoppingCartClicked,
   setShoppingCartClicked,
+  userId,
 }: {
   shoppingCartClicked: boolean;
   setShoppingCartClicked: React.Dispatch<React.SetStateAction<boolean>>;
+  userId: string;
 }) => {
-  const cart = useCartSelector((state) => state.cart.items);
   const dispatch = useCartDispatch();
+  const {
+    items: cart,
+    loading,
+    error,
+  } = useCartSelector((state) => state.cart);
 
-  const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
-  const totalPrice = cart.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
-  );
+  console.log(cart, "cart");
+
+  useEffect(() => {
+    dispatch(fetchCartItems(userId as string));
+  }, [shoppingCartClicked, userId, dispatch]);
+
+  const handleRemoveItem = async (productId: number, size: string) => {
+    console.log(productId, size, "productId size");
+    try {
+      await dispatch(updateCartItem({ userId, productId, size })).unwrap();
+      toast({
+        title: "Removed",
+        description: "Item removed from cart.",
+        className: "bg-red-500 text-white",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error as string,
+        className: "bg-red-500 text-white",
+      });
+    }
+  };
+
+  const handleAddItem = async (item: any) => {
+    console.log(item,'item')
+    if (item.quantity >= item.quantityInStore) {
+      toast({
+        title: "Error",
+        description: "Not enough stock available.",
+        className: "bg-red-500 text-white",
+      });
+      return;
+    }
+
+    try {
+      await dispatch(
+        addCartItem({
+          userId: Number(userId),
+          productId: item.product.id,
+          size: item.size,
+          quantity: item.quantity+1,
+          quantityInStore: item.quantityInStore,
+        })
+      ).unwrap();
+
+      toast({
+        title: "Success",
+        description: `${item.title} (${item.size}) quantity updated.`,
+        className: "bg-green-500 text-white",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error as string,
+        className: "bg-red-500 text-white",
+      });
+    }
+  };
 
   return (
     <Dialog open={shoppingCartClicked} onOpenChange={setShoppingCartClicked}>
-      <DialogTrigger asChild></DialogTrigger>
+      <DialogTrigger asChild />
       <DialogContent className="sm:max-w-[425px] bg-black text-white">
         <DialogHeader>
           <DialogTitle>Your Cart</DialogTitle>
         </DialogHeader>
         <div className="mt-4">
-          <Badge variant="secondary" className="mb-4">
-            <ShoppingCart className="w-4 h-4 mr-1" />
-            {totalItems} {totalItems === 1 ? "item" : "items"}
-          </Badge>
+          {cart.length > 0 && (
+            <Badge variant="secondary" className="mb-4">
+              <ShoppingCart className="w-4 h-4 mr-1" />
+              {cart.length} item{cart.length > 1 ? "s" : ""}
+            </Badge>
+          )}
+          {loading && <p>Loading cart items...</p>}
+          {error && <p className="text-red-500">{error}</p>}
           <ScrollArea className="h-[300px] pr-4">
-            {cart.map((item) => (
-              <Card
-                key={`${item.id}-${item.size}`} // Ensure unique key for different sizes
-                className="mb-4 bg-gray-900 text-white"
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="relative w-16 h-16 rounded-md overflow-hidden">
-                      <Image
-                        src={item.img || "/placeholder.svg"}
-                        alt={item.title}
-                        layout="fill"
-                        objectFit="cover"
-                      />
+            {loading === false &&
+              cart.map((item) => (
+                <Card
+                  key={`${item.id}-${item.size}`}
+                  className="mb-4 bg-gray-900 text-white"
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="relative w-16 h-16 rounded-md overflow-hidden">
+                        {item.product.images[0] ? (
+                          <Image
+                            src={item.product.images[0]}
+                            alt={`${item.product.name} image`}
+                            layout="fill"
+                            objectFit="cover"
+                          />
+                        ) : null}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold">{item.product.name}</h3>
+                        <p className="text-sm text-gray-400">
+                          Size: <span className="font-bold">{item.size}</span>
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          ${item.product.price.toFixed(2)}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="w-8 h-8 text-white border-white"
+                          onClick={() =>
+                            handleRemoveItem(item.productId, item.size)
+                          }
+                        >
+                          <Minus className="w-4 h-4" />
+                        </Button>
+                        <span className="font-semibold">{item.quantity}</span>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="w-8 h-8 text-white border-white"
+                          disabled={item.quantity >= item.quantityInStore}
+                          onClick={() => handleAddItem(item)}
+                        >
+                          <Plus className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{item.title}</h3>
-                      <p className="text-sm text-gray-400">
-                        Size: <span className="font-bold">{item.size}</span>
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        ${item.price.toFixed(2)}
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="w-8 h-8 text-white border-white"
-                        onClick={() =>
-                          dispatch(removeFromCart({ id: item.id, size: item.size }))
-                        }
-                      >
-                        <Minus className="w-4 h-4" />
-                      </Button>
-                      <span className="font-semibold">{item.quantity}</span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="w-8 h-8 text-white border-white"
-                        disabled={
-                          item.quantityInStore === 0 ||
-                          item.quantityInStore < item.quantity + 1
-                        }
-                        onClick={() =>
-                          dispatch(
-                            addToCart({
-                              id: item.id,
-                              img: item.img,
-                              title: item.title,
-                              size: item.size, // Include size when updating cart
-                              price: item.price,
-                              quantityInStore: item.quantityInStore,
-                              slug: item.slug,
-                              quantity: 1,
-                            })
-                          )
-                        }
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))}
           </ScrollArea>
           <div className="mt-6 space-y-4">
             <div className="flex justify-between">
               <span className="font-semibold">Total:</span>
-              <span className="font-bold">${totalPrice.toFixed(2)}</span>
             </div>
             <Button className="w-full bg-white text-black">Checkout</Button>
           </div>

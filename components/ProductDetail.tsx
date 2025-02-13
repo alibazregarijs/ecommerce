@@ -13,6 +13,7 @@ interface ProductDetailProps {
   quantity: number;
   searchParams: { [key: string]: string | string[] | undefined };
   pathname: string;
+  userId: number;
 }
 
 const ProductDetail = ({
@@ -22,9 +23,10 @@ const ProductDetail = ({
   quantity,
   searchParams,
   pathname,
+  userId,
 }: ProductDetailProps) => {
   const initialQuantity = quantity || 1;
-  const selectedSize = size || "Medium";
+  const selectedSize = size || "M";
   const selectedImage = image || product.images?.[0] || "/product/default.png";
 
   // Helper function to create query strings
@@ -34,8 +36,9 @@ const ProductDetail = ({
     return `${pathname}?${params.toString()}`;
   };
 
-  console.log(initialQuantity,"initialQuantity")
+  console.log(initialQuantity, "initialQuantity");
 
+  console.log("salamsssssssssssssss");
   return (
     <section>
       <div className="grid mx-16 md:grid-cols-12 gap-2 grid-cols-1 md:grid-rows-3 md:gap-4">
@@ -71,14 +74,14 @@ const ProductDetail = ({
 
         {/* Product Details */}
         <div className="md:col-span-6 col-span-12 md:order-3 order-3">
-          <Product product={product} productDetail={true} userId={2} />
+          <Product product={product} productDetail={true} userId={userId} />
           <div className="border bottom-1 border-gray-200 w-full mt-10"></div>
 
           {/* Size Selection */}
           <div className="flex flex-col space-y-2 justify-center items-start">
             <p className="text-sm text-gray-500 font-mono mt-4">Choose Size</p>
             <div className="flex justify-center space-x-2 items-center">
-              {["Small", "Medium", "Large", "X-Large"].map((size) => (
+              {["S", "M", "L", "XL"].map((size) => (
                 <Link key={size} href={createQueryString("size", size)}>
                   <Button
                     className={`bg-gray-200 hover:bg-black hover:text-white ${
@@ -129,6 +132,7 @@ const ProductDetail = ({
                 price={product.price}
                 quantityInStore={product.quantity}
                 slug={product.slug}
+                userId={userId}
               />
             </div>
           </div>

@@ -1,10 +1,10 @@
 "use client"; // Ensure it's a client component
 
-import { useDispatch } from "react-redux";
-import { addToCart } from "@/store/CartSlice";
+import { useCartSelector, useCartDispatch } from "@/store/hook";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { useCartSelector } from "@/store/hook";
+import { addCartItem, fetchCartItems } from "@/store/CartSlice";
+import { useEffect } from "react";
 
 interface AddToCartButtonProps {
   productId: string;
@@ -15,6 +15,7 @@ interface AddToCartButtonProps {
   price: number;
   quantityInStore: number;
   slug: string;
+  userId: number;
 }
 
 const AddToCartButton = ({
@@ -26,48 +27,61 @@ const AddToCartButton = ({
   price,
   quantityInStore,
   slug,
+  userId,
 }: AddToCartButtonProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useCartDispatch();
 
-  const cart = useCartSelector((state) =>
-    state.cart.items.find((item) => item.id === productId && item.size === size) // Match size too
+  // Get the cart item for this specific product & size
+  const cartItem = useCartSelector((state) =>
+    state.cart.items.find((item) => item.id === Number(productId) && item.size === size)
   );
 
-  const handleAddToCart = () => {
-    let correctQuantityMessage = "";
-    let sumOfQuantities = (cart?.quantity || 0) + quantity; // Include size-specific quantity
+  useEffect(()=>{
+    dispatch(fetchCartItems(userId.toString()))
+  },[dispatch])
+
+  const handleAddToCart = async () => {
+    let errorMessage = "";
+    let newQuantity = (cartItem?.quantity || 0) + quantity;
 
     if (quantity <= 0) {
-      correctQuantityMessage = "Please enter a valid quantity.";
-    }
-    if (
-      quantity > quantityInStore ||
-      quantityInStore === 0 ||
-      sumOfQuantities > quantityInStore
-    ) {
-      correctQuantityMessage = "Sorry, this product is out of stock.";
-    }
-    if (correctQuantityMessage) {
-      toast({
-        title: "Error",
-        description: correctQuantityMessage,
-        className: "bg-white text-black",
-      });
-      return; // Prevent adding to cart if there's an error
+      errorMessage = "Please enter a valid quantity.";
+    } else if (quantityInStore === 0 || newQuantity > quantityInStore) {
+      errorMessage = "Sorry, this product is out of stock.";
     }
 
-    dispatch(
-      addToCart({
-        id: productId,
-        img: image,
-        quantity,
-        title,
-        size, // Include size when adding to cart
-        price,
-        quantityInStore,
-        slug,
-      })
-    );
+    if (errorMessage) {
+      toast({
+        title: "Error",
+        description: errorMessage,
+        className: "bg-white text-black",
+      });
+      return;
+    }
+
+    try {
+      await dispatch(
+        addCartItem({
+          quantity,
+          size,
+          userId,
+          productId,
+          quantityInStore
+        })
+      ).unwrap(); // Ensures error handling in async thunk
+
+      toast({
+        title: "Success",
+        description: `${title} with this size (${size}) added to cart!`,
+        className: "bg-green-500 text-white",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error as string,
+        className: "bg-red-500 text-white",
+      });
+    }
   };
 
   return (
