@@ -50,5 +50,3 @@ export type CartItem = {
   userId: number;
   slug: string;
 };
-
-

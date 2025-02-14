@@ -10,13 +10,10 @@ import { type CartItem } from "@/type";
 
 const AddToCartButton = ({
   productId,
-
   size,
   quantity,
   title,
-
   quantityInStore,
-
   userId,
 }: CartItem) => {
   const dispatch = useCartDispatch();

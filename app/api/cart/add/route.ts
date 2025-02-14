@@ -76,7 +76,7 @@ export async function POST(req: Request) {
       size: cartItem?.size,
       quantity: cartItem?.quantity,
       product: {
-        id:
+        id:cartItem?.product.id,
         name: cartItem?.product.name,
         price: cartItem?.product.price,
         images: cartItem?.product.images,

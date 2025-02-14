@@ -2,32 +2,26 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { type CartItem } from "@/type";
 
-const API_BASE_URL = "api/cart/add"; // Adjust based on your backend
-
-// Define the CartItem type
-
 // Define the CartState type
 type CartState = {
   items: CartItem[];
   loading: boolean;
   error: string | null;
+  pendingUpdates: Record<string, boolean>; // Track pending updates
 };
 
-// Initial state
 const initialState: CartState = {
   items: [],
   loading: false,
   error: null,
+  pendingUpdates: {}, // Initialize as empty
 };
-
 // ** Fetch all cart items for a specific user **
 export const fetchCartItems = createAsyncThunk(
   "cart/fetchCartItems",
   async (userId: string, { rejectWithValue }) => {
     try {
       const response = await axios.get(`/api/cart/${userId}`);
-
-      console.log(response.data.totalPrice, "totalPrice");
       return response.data.cart; // Ensure the response is an array
     } catch (error) {
       if (error instanceof Error) {
@@ -61,10 +55,9 @@ export const addCartItem = createAsyncThunk(
         userId,
         productId,
         size,
-        quantity: quantity, // Always increment by 1
+        quantity,
         quantityInStore,
       });
-
       return response.data;
     } catch (error) {
       if (error instanceof Error) {
@@ -74,7 +67,7 @@ export const addCartItem = createAsyncThunk(
   }
 );
 
-// ** Remove a cart item **
+// ** Update cart item (optimistic update) **
 export const updateCartItem = createAsyncThunk(
   "cart/updateCartItem",
   async (
@@ -83,20 +76,50 @@ export const updateCartItem = createAsyncThunk(
       productId,
       size,
       type,
-    }: { userId: string; productId: number; size: string , type:string },
-    { rejectWithValue }
+      quantity,
+    }: {
+      userId: string;
+      productId: number;
+      size: string;
+      type: string;
+      quantity: number;
+    },
+    { rejectWithValue, dispatch }
   ) => {
-    console.log(userId, "userId", productId, "productId", size, "size",type,"type","cartslice");
+    const itemKey = `${productId}-${size}`;
+
     try {
-      const updatedCart = await axios.put(`/api/cart/update/${userId}`, {
+      // Optimistic Update
+      console.log(quantity, "quantity cart slice");
+      dispatch(
+        cartSlice.actions.updateCartItemOptimistically({
+          productId,
+          size,
+          type,
+          quantity,
+        })
+      );
+      console.log("before api call");
+      // API Call
+      const response = await axios.put(`/api/cart/update/${userId}`, {
         userId,
         productId,
         size,
-        type
+        type,
+        quantity,
       });
-      return updatedCart.data;
+
+      return { updatedItem: response.data }; // Ensure the updated item is returned
     } catch (error) {
       if (error instanceof Error) {
+        dispatch(
+          cartSlice.actions.revertCartItemUpdate({
+            productId,
+            size,
+            type,
+            quantity,
+          })
+        );
         return rejectWithValue(error.message || "Failed to update cart item");
       }
     }
@@ -108,11 +131,12 @@ export const clearCartThunk = createAsyncThunk(
   "cart/clearCart",
   async (userId: string, { rejectWithValue }) => {
     try {
-      await axios.delete(`${API_BASE_URL}/${userId}`);
+      await axios.delete(`/api/cart/clear/${userId}`);
       return [];
     } catch (error) {
-      if (error instanceof Error)
+      if (error instanceof Error) {
         return rejectWithValue(error.message || "Failed to clear cart");
+      }
     }
   }
 );
@@ -121,7 +145,62 @@ export const clearCartThunk = createAsyncThunk(
 export const cartSlice = createSlice({
   name: "cart",
   initialState,
-  reducers: {},
+  reducers: {
+    // Optimistic update
+    updateCartItemOptimistically: (
+      state,
+      action: PayloadAction<{
+        productId: number;
+        size: string;
+        type: string;
+        quantity: number;
+      }>
+    ) => {
+      const { productId, size, quantity } = action.payload;
+      const itemKey = `${productId}-${size}`;
+
+      // Mark this item as having a pending update
+      state.pendingUpdates[itemKey] = true;
+
+      const item = state.items.find(
+        (item) => item.productId === productId && item.size === size
+      );
+
+      if (item) {
+        item.quantity = quantity; // Update the quantity directly
+        if (item.quantity <= 0) {
+          state.items = state.items.filter((i) => i !== item); // Remove without changing array reference
+        }
+      }
+    },
+
+    revertCartItemUpdate: (
+      state,
+      action: PayloadAction<{
+        productId: number;
+        size: string;
+        type: string;
+        quantity: number;
+      }>
+    ) => {
+      const { productId, size, type, quantity } = action.payload;
+      const itemKey = `${productId}-${size}`;
+
+      // Remove the pending update flag
+      delete state.pendingUpdates[itemKey];
+
+      const item = state.items.find(
+        (item) => item.productId === productId && item.size === size
+      );
+
+      if (item) {
+        item.quantity = quantity;
+        if (item.quantity <= 0) {
+          state.items = state.items.filter((i) => i !== item); // Remove without changing array reference
+        }
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder
       // Fetch Cart Items
@@ -132,6 +211,7 @@ export const cartSlice = createSlice({
       .addCase(
         fetchCartItems.fulfilled,
         (state, action: PayloadAction<CartItem[]>) => {
+          // console.log("fetchCartItems.fulfilled", action.payload);
           state.loading = false;
           state.items = action.payload;
         }
@@ -141,72 +221,71 @@ export const cartSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // Add to Cart
-      .addCase(
-        addCartItem.fulfilled,
-        (state, action: PayloadAction<CartItem>) => {
-          const existingItem = state.items.find(
-            (item) =>
-              item.id === action.payload.id && item.size === action.payload.size
-          );
-
-          if (existingItem) {
-            console.log("1")
-            const totalQuantity = action.payload.quantity;
-
-            if (totalQuantity > existingItem.quantityInStore) {
-              console.log("2")
-              existingItem.quantity = existingItem.quantityInStore;
-            } else {
-                console.log("3")
-              existingItem.quantity = totalQuantity;
-            }
-          } else {
-            console.log("4")
-            state.items.push({
-              ...action.payload,
-              quantity: action.payload.quantity || 1,
-            });
-          }
-        }
-      )
-
-      // update from Cart
       // Update Cart Item
-      .addCase(
-        updateCartItem.fulfilled,
-        (
-          state,
-          action: PayloadAction<
-            { productId: string; size: string; quantity: number } | undefined
-          >
-        ) => {
-          const payload = action.payload;
-          if (!payload) return; // Ensure payload exists before updating state
-      
-          const existingItemIndex = state.items.findIndex(
-            (item) =>
-              item.productId === Number(payload.productId) &&
-              item.size === payload.size
-          );
-      
-          if (existingItemIndex !== -1) {
-            if (payload.quantity > 0) {
-              state.items[existingItemIndex].quantity = payload.quantity;
-            } else {
-              // Remove item from the array if quantity is 0
-              state.items.splice(existingItemIndex, 1);
-            }
-          }
-        }
-      )
-      
+      .addCase(updateCartItem.fulfilled, (state, action) => {
+        // console.log("updateCartItem.fulfilled", action.payload);
+        const { productId, size } = action.meta.arg;
+        const itemKey = `${productId}-${size}`;
 
-      // Clear Cart
-      .addCase(clearCartThunk.fulfilled, (state) => {
-        state.items = [];
+        // console.log( state.pendingUpdates[itemKey],"sss")
+
+        // Remove the pending update flag
+        delete state.pendingUpdates[itemKey];
+      })
+      .addCase(updateCartItem.rejected, (state, action) => {
+        state.error = action.payload as string;
       });
   },
 });
 
+export const { updateCartItemOptimistically, revertCartItemUpdate } =
+  cartSlice.actions;
 export default cartSlice.reducer;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
