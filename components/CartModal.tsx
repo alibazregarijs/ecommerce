@@ -65,7 +65,6 @@ const CartModal = ({
         updateCartItemOptimistically({
           productId,
           size,
-          type,
           quantity: newQuantity,
         })
       );
@@ -94,7 +93,7 @@ const CartModal = ({
     console.log(
       `Final update logic for product ${productId} (Size: ${size}) - Final quantity: ${quantity}`
     );
-    const res = await dispatch(updateCartItem({ userId, productId, size, type: quantity > 0 ? 'add' : 'remove', quantity }));
+    const res = await dispatch(updateCartItem({ userId, productId, size, quantity }));
     if(res) {
       setIsCartUpdating(false);
     }

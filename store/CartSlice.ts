@@ -75,13 +75,11 @@ export const updateCartItem = createAsyncThunk(
       userId,
       productId,
       size,
-      type,
       quantity,
     }: {
       userId: string;
       productId: number;
       size: string;
-      type: string;
       quantity: number;
     },
     { rejectWithValue, dispatch }
@@ -95,7 +93,6 @@ export const updateCartItem = createAsyncThunk(
         cartSlice.actions.updateCartItemOptimistically({
           productId,
           size,
-          type,
           quantity,
         })
       );
@@ -105,7 +102,6 @@ export const updateCartItem = createAsyncThunk(
         userId,
         productId,
         size,
-        type,
         quantity,
       });
 
@@ -116,7 +112,6 @@ export const updateCartItem = createAsyncThunk(
           cartSlice.actions.revertCartItemUpdate({
             productId,
             size,
-            type,
             quantity,
           })
         );
@@ -152,7 +147,6 @@ export const cartSlice = createSlice({
       action: PayloadAction<{
         productId: number;
         size: string;
-        type: string;
         quantity: number;
       }>
     ) => {
@@ -179,11 +173,10 @@ export const cartSlice = createSlice({
       action: PayloadAction<{
         productId: number;
         size: string;
-        type: string;
         quantity: number;
       }>
     ) => {
-      const { productId, size, type, quantity } = action.payload;
+      const { productId, size, quantity } = action.payload;
       const itemKey = `${productId}-${size}`;
 
       // Remove the pending update flag
