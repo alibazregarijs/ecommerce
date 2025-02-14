@@ -152,18 +152,22 @@ export const cartSlice = createSlice({
     ) => {
       const { productId, size, quantity } = action.payload;
       const itemKey = `${productId}-${size}`;
-
+    
       // Mark this item as having a pending update
       state.pendingUpdates[itemKey] = true;
-
-      const item = state.items.find(
+    
+      // Find the item in the array
+      const itemIndex = state.items.findIndex(
         (item) => item.productId === productId && item.size === size
       );
-
-      if (item) {
-        item.quantity = quantity; // Update the quantity directly
-        if (item.quantity <= 0) {
-          state.items = state.items.filter((i) => i !== item); // Remove without changing array reference
+    
+      if (itemIndex !== -1) {
+        // Update the quantity directly in the array
+        state.items[itemIndex].quantity = quantity;
+    
+        // If the quantity is less than or equal to 0, remove the item from the array
+        if (quantity <= 0) {
+          state.items.splice(itemIndex, 1);
         }
       }
     },

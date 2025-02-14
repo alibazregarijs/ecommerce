@@ -20,6 +20,7 @@ export async function GET(request: Request, props: { params: Promise<{ id: strin
       where: { userId },
       include: {
         items: {
+          orderBy: { id: "desc" },
           include: {
             product: {
               select: {
@@ -43,12 +44,9 @@ export async function GET(request: Request, props: { params: Promise<{ id: strin
     }
 
     // Calculate total price
-    const totalPrice = cart.items.reduce((sum, item) => {
-      return sum + item.product.price * item.quantity;
-    }, 0);
-
+   
     return NextResponse.json(
-      { message: "Cart retrieved successfully", cart: cart.items, totalPrice },
+      { message: "Cart retrieved successfully", cart: cart.items },
       { status: 200 }
     );
   } catch (error) {
