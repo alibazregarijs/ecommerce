@@ -42,7 +42,6 @@ const CartModal = ({
   } = useCartSelector((state) => state.cart);
 
   const clickTimeout = useRef<NodeJS.Timeout | null>(null);
-  const [clicking, setClicking] = useState(false);
   const [isCartUpdating, setIsCartUpdating] = useState(false);
 
   const handleQuantityChange = async (
@@ -51,7 +50,7 @@ const CartModal = ({
     type: string,
     quantity: number
   ) => {
-    setClicking(true);
+
 
     if (clickTimeout.current) {
       clearTimeout(clickTimeout.current);
@@ -78,10 +77,10 @@ const CartModal = ({
 
     // Set timeout to detect last click
     clickTimeout.current = setTimeout(() => {
-      setClicking(false);
+  
       console.log("User stopped clicking - Performing final update");
       finalizeUpdate(productId, size, newQuantity);
-    }, 500); // Adjust delay as needed
+    }, 1000); // Adjust delay as needed
   };
 
   const finalizeUpdate = async (
