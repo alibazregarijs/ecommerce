@@ -25,9 +25,7 @@ const AddToCartButton = ({
     )
   );
 
-  useEffect(() => {
-    dispatch(fetchCartItems(userId.toString()));
-  }, [dispatch]);
+
 
   const handleAddToCart = async () => {
     let errorMessage = "";
@@ -58,6 +56,7 @@ const AddToCartButton = ({
           quantityInStore,
         })
       ).unwrap(); // Ensures error handling in async thunk
+
 
       toast({
         title: "Success",

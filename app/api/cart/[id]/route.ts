@@ -20,6 +20,7 @@ export async function GET(request: Request, props: { params: Promise<{ id: strin
       where: { userId },
       include: {
         items: {
+          where: { quantity: { not: 0 } },
           orderBy: { id: "desc" },
           include: {
             product: {
@@ -28,7 +29,8 @@ export async function GET(request: Request, props: { params: Promise<{ id: strin
                 name: true,
                 price: true,
                 images: true,
-                description:true
+                description:true,
+                quantity: true
               },
             },
           },

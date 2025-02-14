@@ -80,6 +80,8 @@ export async function POST(req: Request) {
         name: cartItem?.product.name,
         price: cartItem?.product.price,
         images: cartItem?.product.images,
+        description: cartItem?.product.description,
+        quantityInStore: cartItem?.product.quantity,
       },
     });
   } catch (error) {

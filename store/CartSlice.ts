@@ -76,11 +76,13 @@ export const updateCartItem = createAsyncThunk(
       productId,
       size,
       quantity,
+      quantityInStore,
     }: {
       userId: string;
       productId: number;
       size: string;
       quantity: number;
+      quantityInStore: number;
     },
     { rejectWithValue, dispatch }
   ) => {
@@ -88,15 +90,16 @@ export const updateCartItem = createAsyncThunk(
 
     try {
       // Optimistic Update
-      console.log(quantity, "quantity cart slice");
+
       dispatch(
         cartSlice.actions.updateCartItemOptimistically({
           productId,
           size,
           quantity,
+          quantityInStore,
         })
       );
-      console.log("before api call");
+
       // API Call
       const response = await axios.put(`/api/cart/update/${userId}`, {
         userId,
@@ -148,23 +151,24 @@ export const cartSlice = createSlice({
         productId: number;
         size: string;
         quantity: number;
+        quantityInStore: number;
       }>
     ) => {
-      const { productId, size, quantity } = action.payload;
+      const { productId, size, quantity, quantityInStore } = action.payload;
       const itemKey = `${productId}-${size}`;
-    
+
       // Mark this item as having a pending update
       state.pendingUpdates[itemKey] = true;
-    
+
       // Find the item in the array
       const itemIndex = state.items.findIndex(
         (item) => item.productId === productId && item.size === size
       );
-    
+
       if (itemIndex !== -1) {
         // Update the quantity directly in the array
         state.items[itemIndex].quantity = quantity;
-    
+
         // If the quantity is less than or equal to 0, remove the item from the array
         if (quantity <= 0) {
           state.items.splice(itemIndex, 1);
@@ -208,7 +212,6 @@ export const cartSlice = createSlice({
       .addCase(
         fetchCartItems.fulfilled,
         (state, action: PayloadAction<CartItem[]>) => {
-          // console.log("fetchCartItems.fulfilled", action.payload);
           state.loading = false;
           state.items = action.payload;
         }
@@ -220,11 +223,8 @@ export const cartSlice = createSlice({
 
       // Update Cart Item
       .addCase(updateCartItem.fulfilled, (state, action) => {
-        // console.log("updateCartItem.fulfilled", action.payload);
         const { productId, size } = action.meta.arg;
         const itemKey = `${productId}-${size}`;
-
-        // console.log( state.pendingUpdates[itemKey],"sss")
 
         // Remove the pending update flag
         delete state.pendingUpdates[itemKey];
@@ -238,51 +238,3 @@ export const cartSlice = createSlice({
 export const { updateCartItemOptimistically, revertCartItemUpdate } =
   cartSlice.actions;
 export default cartSlice.reducer;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

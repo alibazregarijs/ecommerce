@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { useCartSelector, useCartDispatch } from "@/store/hook";
 import {
+  fetchCartItems,
   updateCartItem,
   updateCartItemOptimistically,
 } from "@/store/CartSlice";
@@ -17,7 +18,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { type CartItem } from "@/type";
 
 const CartModal = ({
   shoppingCartClicked,
@@ -29,33 +31,52 @@ const CartModal = ({
   userId: string;
 }) => {
   const dispatch = useCartDispatch();
+
+  useEffect(() => {
+    dispatch(fetchCartItems(userId.toString()));
+  }, [dispatch, userId]);
+
   const {
     items: cart,
     loading,
     error,
   } = useCartSelector((state) => state.cart);
-  
-  const totalPrice = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
 
   const clickTimeout = useRef<NodeJS.Timeout | null>(null);
   const [isCartUpdating, setIsCartUpdating] = useState(false);
+
+  const totalPrice = cart.reduce(
+    (acc, item) => acc + item.product.price * item.quantity,
+    0
+  );
 
   const handleQuantityChange = async (
     productId: number,
     size: string,
     type: string,
-    quantity: number
+    quantity: number,
+    quantityInStore: number
   ) => {
     if (clickTimeout.current) {
       clearTimeout(clickTimeout.current);
     }
     const newQuantity = type === "add" ? quantity + 1 : quantity - 1;
     try {
+      if (newQuantity > quantityInStore && type === "add") {
+        toast({
+          title: "Error",
+          description: "item is out of stock",
+          className: "bg-red-500 text-white",
+        });
+        return;
+      }
+
       dispatch(
         updateCartItemOptimistically({
           productId,
           size,
           quantity: newQuantity,
+          quantityInStore,
         })
       );
     } catch (error) {
@@ -67,18 +88,19 @@ const CartModal = ({
     }
     // Set timeout to detect last click
     clickTimeout.current = setTimeout(() => {
-      finalizeUpdate(productId, size, newQuantity);
+      finalizeUpdate(productId, size, newQuantity, quantityInStore);
     }, 1000); // Adjust delay as needed
   };
 
   const finalizeUpdate = async (
     productId: number,
     size: string,
-    quantity: number
+    quantity: number,
+    quantityInStore: number
   ) => {
     setIsCartUpdating(true);
     const res = await dispatch(
-      updateCartItem({ userId, productId, size, quantity })
+      updateCartItem({ userId, productId, size, quantity, quantityInStore })
     );
     if (res) {
       setIsCartUpdating(false);
@@ -99,7 +121,8 @@ const CartModal = ({
               {cart.length} item{cart.length > 1 ? "s" : ""}
             </Badge>
           )}
-          {loading && <p>Loading cart items...</p>}
+          {loading && cart.length === 0 && <p>Loading cart items...</p>}
+
           {error && <p className="text-red-500">{error}</p>}
           <ScrollArea className="h-[300px] pr-4">
             {cart.map((item) => (
@@ -139,7 +162,8 @@ const CartModal = ({
                             item.productId,
                             item.size,
                             "remove",
-                            item.quantity
+                            item.quantity,
+                            item.product.quantity
                           )
                         }
                       >
@@ -150,18 +174,16 @@ const CartModal = ({
                         variant="outline"
                         size="icon"
                         className="w-8 h-8 text-white border-white"
-                        disabled={
-                          item.quantity >= item.quantityInStore ||
-                          isCartUpdating
-                        }
-                        onClick={() =>
+                        disabled={isCartUpdating}
+                        onClick={() => {
                           handleQuantityChange(
                             item.productId,
                             item.size,
                             "add",
-                            item.quantity
-                          )
-                        }
+                            item.quantity,
+                            item.product.quantity
+                          );
+                        }}
                       >
                         <Plus className="w-4 h-4" />
                       </Button>
