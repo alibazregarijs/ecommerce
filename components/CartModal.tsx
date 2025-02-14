@@ -1,10 +1,6 @@
 import Image from "next/image";
-import { useEffect } from "react";
-
 import { useCartSelector, useCartDispatch } from "@/store/hook";
 import {
-  fetchCartItems,
-  addCartItem,
   updateCartItem,
   updateCartItemOptimistically,
 } from "@/store/CartSlice";
@@ -21,9 +17,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-
 import { useState, useRef } from "react";
-import { set } from "lodash";
 
 const CartModal = ({
   shoppingCartClicked,
@@ -40,6 +34,8 @@ const CartModal = ({
     loading,
     error,
   } = useCartSelector((state) => state.cart);
+  
+  const totalPrice = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
 
   const clickTimeout = useRef<NodeJS.Timeout | null>(null);
   const [isCartUpdating, setIsCartUpdating] = useState(false);
@@ -50,15 +46,10 @@ const CartModal = ({
     type: string,
     quantity: number
   ) => {
-
-
     if (clickTimeout.current) {
       clearTimeout(clickTimeout.current);
     }
-
-    // Adjust quantity
     const newQuantity = type === "add" ? quantity + 1 : quantity - 1;
-
     try {
       dispatch(
         updateCartItemOptimistically({
@@ -74,11 +65,8 @@ const CartModal = ({
         className: "bg-red-500 text-white",
       });
     }
-
     // Set timeout to detect last click
     clickTimeout.current = setTimeout(() => {
-  
-      console.log("User stopped clicking - Performing final update");
       finalizeUpdate(productId, size, newQuantity);
     }, 1000); // Adjust delay as needed
   };
@@ -88,12 +76,11 @@ const CartModal = ({
     size: string,
     quantity: number
   ) => {
-    setIsCartUpdating(true)
-    console.log(
-      `Final update logic for product ${productId} (Size: ${size}) - Final quantity: ${quantity}`
+    setIsCartUpdating(true);
+    const res = await dispatch(
+      updateCartItem({ userId, productId, size, quantity })
     );
-    const res = await dispatch(updateCartItem({ userId, productId, size, quantity }));
-    if(res) {
+    if (res) {
       setIsCartUpdating(false);
     }
   };
@@ -163,7 +150,10 @@ const CartModal = ({
                         variant="outline"
                         size="icon"
                         className="w-8 h-8 text-white border-white"
-                        disabled={item.quantity >= item.quantityInStore || isCartUpdating}
+                        disabled={
+                          item.quantity >= item.quantityInStore ||
+                          isCartUpdating
+                        }
                         onClick={() =>
                           handleQuantityChange(
                             item.productId,
@@ -184,6 +174,7 @@ const CartModal = ({
           <div className="mt-6 space-y-4">
             <div className="flex justify-between">
               <span className="font-semibold">Total:</span>
+              <span className="font-bold">${totalPrice.toFixed(2)}</span>
             </div>
             <Button className="w-full bg-white text-black">Checkout</Button>
           </div>
@@ -194,4 +185,3 @@ const CartModal = ({
 };
 
 export default CartModal;
-
