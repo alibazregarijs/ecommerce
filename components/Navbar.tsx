@@ -7,12 +7,10 @@ import { HambergerMenu } from "iconsax-react";
 import { SearchNormal1 } from "iconsax-react";
 import CartModal from "@/components/CartModal";
 
-const Navbar = ({userId}:{userId:string}) => {
+const Navbar = ({ userId }: { userId: string }) => {
   const [isOpen, setIsOpen] = useState({ hamburger: false, search: false });
 
   const [shoppingCartClicked, setShoppingCartClicked] = useState(false);
-
-  console.log(userId,"in navbar")
 
   const handleToggle = ({ type }: { type: "hamburger" | "search" }) => {
     setIsOpen(
@@ -39,8 +37,13 @@ const Navbar = ({userId}:{userId:string}) => {
               size="24"
               color="#000"
             />
-            <ShoppingCart  className="cursor-pointer" size="24" color="#000" />
-            <ProfileCircle className="cursor-pointer"  size="24" color="#000" />
+            <ShoppingCart
+              onClick={() => setShoppingCartClicked((prev) => !prev)}
+              className="cursor-pointer"
+              size="24"
+              color="#000"
+            />
+            <ProfileCircle className="cursor-pointer" size="24" color="#000" />
           </div>
         </div>
         {isOpen.hamburger && (
@@ -78,13 +81,23 @@ const Navbar = ({userId}:{userId:string}) => {
           <Searchbox />
         </div>
         <div className="flex justify-center items-center mx-10 space-x-4">
-          <ShoppingCart onClick={() => setShoppingCartClicked((prev)=>!prev)}  className="cursor-pointer" size="24" color="#000" />
+          <ShoppingCart
+            onClick={() => setShoppingCartClicked((prev) => !prev)}
+            className="cursor-pointer"
+            size="24"
+            color="#000"
+          />
           <ProfileCircle className="cursor-pointer" size="24" color="#000" />
         </div>
       </div>
-      {shoppingCartClicked && <CartModal userId={userId} shoppingCartClicked={shoppingCartClicked} setShoppingCartClicked={setShoppingCartClicked} />}
+      {shoppingCartClicked && (
+        <CartModal
+          userId={userId}
+          shoppingCartClicked={shoppingCartClicked}
+          setShoppingCartClicked={setShoppingCartClicked}
+        />
+      )}
     </nav>
-
   );
 };
 

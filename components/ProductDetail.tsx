@@ -29,6 +29,8 @@ const ProductDetail = ({
   const selectedSize = size || "M";
   const selectedImage = image || product.images?.[0] || "/product/default.png";
 
+  console.log(product.images, "product.images");
+
   // Helper function to create query strings
   const createQueryString = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams as Record<string, string>);
@@ -41,15 +43,16 @@ const ProductDetail = ({
   console.log("salamsssssssssssssss");
   return (
     <section>
-      <div className="grid mx-16 md:grid-cols-12 gap-2 grid-cols-1 md:grid-rows-3 md:gap-4">
+      <div className="grid place-items-center md:place-items-start mx-16 md:grid-cols-12 gap-2 grid-cols-1 md:grid-rows-3 md:gap-4">
         {/* Image Selector */}
-        <div className="md:col-span-2 col-span-12 space-y-3 md:order-1 order-2">
+        {/* Image Selector */}
+        <div className="md:col-span-2 md:grid flex justify-center items-center col-span-12 space-x-3 md:space-y-3 md:order-1 order-2">
           {product.images.map((img, index) => (
             <Link key={index} href={createQueryString("image", img)}>
               <Image
                 src={img}
                 alt={`Product image ${index + 1}`}
-                className={`w-[152px] h-[168px] rounded-[20px] border-2 cursor-pointer ${
+                className={`md:w-[152px] md:h-[168px] object-cover rounded-[20px] border-2 cursor-pointer ${
                   selectedImage === img ? "border-black" : "border-transparent"
                 }`}
                 width={152}
@@ -73,14 +76,14 @@ const ProductDetail = ({
         </div>
 
         {/* Product Details */}
-        <div className="md:col-span-6 col-span-12 md:order-3 order-3">
+        <div className="md:col-span-6 w-full col-span-12 md:order-3 order-3">
           <Product product={product} productDetail={true} userId={userId} />
           <div className="border bottom-1 border-gray-200 w-full mt-10"></div>
 
           {/* Size Selection */}
-          <div className="flex flex-col space-y-2 justify-center items-start">
+          <div className="lg:flex md:flex-col space-y-2 justify-center items-start">
             <p className="text-sm text-gray-500 font-mono mt-4">Choose Size</p>
-            <div className="flex justify-center space-x-2 items-center">
+            <div className="flex lg:justify-center justify-start space-x-2 items-center">
               {["S", "M", "L", "XL"].map((size) => (
                 <Link key={size} href={createQueryString("size", size)}>
                   <Button
@@ -124,7 +127,7 @@ const ProductDetail = ({
             </div>
             <div className="mt-8">
               <AddToCartButton
-                productId={product.id.toString()}
+                productId={Number(product.id)}
                 image={selectedImage}
                 quantity={initialQuantity}
                 size={selectedSize}

@@ -7,6 +7,17 @@ import { addCartItem, fetchCartItems } from "@/store/CartSlice";
 import { useEffect } from "react";
 import { type CartItem } from "@/type";
 
+export interface AddToCartButtonProps {
+  productId: number;
+  size: string;
+  quantity: number;
+  title?: string;
+  image?: string;
+  quantityInStore: number;
+  userId: number;
+  price?: number;
+  slug?: string;
+}
 
 const AddToCartButton = ({
   productId,
@@ -15,7 +26,7 @@ const AddToCartButton = ({
   title,
   quantityInStore,
   userId,
-}: CartItem) => {
+}: AddToCartButtonProps) => {
   const dispatch = useCartDispatch();
 
   // Get the cart item for this specific product & size
@@ -24,8 +35,6 @@ const AddToCartButton = ({
       (item) => item.id === Number(productId) && item.size === size
     )
   );
-
-
 
   const handleAddToCart = async () => {
     let errorMessage = "";
@@ -56,7 +65,6 @@ const AddToCartButton = ({
           quantityInStore,
         })
       ).unwrap(); // Ensures error handling in async thunk
-
 
       toast({
         title: "Success",
