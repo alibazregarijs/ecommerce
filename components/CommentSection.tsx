@@ -5,7 +5,15 @@ import DropDownMenu from "@/components/ui/DropDownMenu";
 import ListingCommnet from "@/components/ListingCommnet";
 import AddCommentModal from "@/components/AddCommentModal";
 
-const CommentSection = () => {
+const CommentSection = ({
+  productId,
+  userId,
+  username,
+}: {
+  productId: number;
+  userId: number;
+  username: string;
+}) => {
   const [filter, setFilter] = useState("newest");
   const [activeTab, setActiveTab] = useState("reviews");
   const [isAddCommentBtnClicked, setAddCommentBtnClicked] = useState(false);
@@ -14,7 +22,7 @@ const CommentSection = () => {
     setActiveTab(tab);
   };
 
-  console.log(filter,"filter")
+  console.log(filter, "filter");
 
   return (
     <>
@@ -49,9 +57,16 @@ const CommentSection = () => {
         </div>
         <div className="flex items-center space-x-2">
           <div>
-            <DropDownMenu option={filter} setOption={setFilter} comment={false} />
+            <DropDownMenu
+              option={filter}
+              setOption={setFilter}
+              comment={false}
+            />
           </div>
-          <Button onClick={() => setAddCommentBtnClicked((prev)=>!prev)} className="bg-black text-white hover:bg-gray-200 hover:text-black px-4 py-2">
+          <Button
+            onClick={() => setAddCommentBtnClicked((prev) => !prev)}
+            className="bg-black text-white hover:bg-gray-200 hover:text-black px-4 py-2"
+          >
             Write a Review
           </Button>
         </div>
@@ -59,7 +74,15 @@ const CommentSection = () => {
 
       {/* Listing Comment */}
       <ListingCommnet />
-      { isAddCommentBtnClicked && <AddCommentModal isAddCommentBtnClicked={isAddCommentBtnClicked} setAddCommentBtnClicked={setAddCommentBtnClicked} /> }
+      {isAddCommentBtnClicked && (
+        <AddCommentModal
+          isAddCommentBtnClicked={isAddCommentBtnClicked}
+          setAddCommentBtnClicked={setAddCommentBtnClicked}
+          productId={productId}
+          userId={userId}
+          username={username}
+        />
+      )}
     </>
   );
 };

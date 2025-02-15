@@ -76,16 +76,19 @@ model Rating {
   product    Product? @relation(fields: [productId], references: [id]) // Nullable for comment rating
   comment    Comment? @relation(fields: [commentId], references: [id]) // Nullable for product rating
 
-  @@check(productId IS NOT NULL OR commentId IS NOT NULL) // Ensures a rating belongs to either a product OR a comment
   @@unique([userId, productId]) // A user can rate a product only once
   @@unique([userId, commentId]) // A user can rate a comment only once
 }
+
 
 model Like {
   id        Int      @id @default(autoincrement())
   userId    Int
   commentId Int
 
+  like      Boolean  @default(false) // Like status (true = liked)
+  createdAt DateTime @default(now())
+  
   // Relationships
   user      User     @relation(fields: [userId], references: [id])
   comment   Comment  @relation(fields: [commentId], references: [id])

@@ -10,6 +10,9 @@ type DispatchFuntion = () => AppDispatch;
 
 export const useProductDispatch: DispatchFuntion = useDispatch;
 export const useCartDispatch: DispatchFuntion = useDispatch;
+export const useCommentDispatch: DispatchFuntion = useDispatch;
 
 export const useProductSelector: TypedUseSelectorHook<RootState> = useSelector;
 export const useCartSelector: TypedUseSelectorHook<RootState> = useSelector;
+export const useCommentSelector: TypedUseSelectorHook<RootState> = useSelector;
+

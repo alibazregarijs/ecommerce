@@ -1,10 +1,9 @@
-import React from 'react';
+import React from "react";
 import { auth } from "@/auth";
 import { createSeenProduct } from "@/lib/actions/product";
-import ProductDetail from '@/components/ProductDetail';
+import ProductDetail from "@/components/ProductDetail";
 import { getProductDetails } from "@/lib/actions/product";
-import CommentSection from '@/components/CommentSection';
-
+import CommentSection from "@/components/CommentSection";
 
 // Define the type for searchParams
 type SearchParams = {
@@ -22,27 +21,32 @@ const Page = async (props: PageProps) => {
   const params = await props.params;
   const slug = params.slug;
 
-
-
   // Extract query parameters
-  const size = (searchParams.size as string) || 'M';
-  const quantity = typeof searchParams.quantity === 'string' ? parseInt(searchParams.quantity) : 1;
-  const image = (searchParams.image as string) || '/product/big-shirt.png';
+  const size = (searchParams.size as string) || "M";
+  const quantity =
+    typeof searchParams.quantity === "string"
+      ? parseInt(searchParams.quantity)
+      : 1;
+  const image = (searchParams.image as string) || "/product/big-shirt.png";
 
   const session = await auth();
-  const userId = Number(session?.user?.id)
+  const userId = Number(session?.user?.id);
 
-await createSeenProduct({ slug, userId: userId ?? 0 });
-const productData = await getProductDetails(slug);
+  await createSeenProduct({ slug, userId: userId ?? 0 });
+  const productData = await getProductDetails(slug);
 
-const product = productData ? {
-  ...productData,
-  size: size,
-  rating: productData.averageRating || 0
-} : null;
+  const product = productData
+    ? {
+        ...productData,
+        size: size,
+        rating: productData.averageRating || 0,
+      }
+    : null;
 
-return (
-    <div className='mt-16'>
+
+
+  return (
+    <div className="mt-16">
       {product && (
         <ProductDetail
           product={product}
@@ -53,12 +57,10 @@ return (
           searchParams={searchParams}
           pathname={`/product/${slug}`}
         />
-      ) 
-    }
-    <CommentSection />
+      )}
+      <CommentSection productId={product?.id!} userId={userId} username={session?.user?.name!} />
     </div>
   );
-  
 };
 
 export default Page;
