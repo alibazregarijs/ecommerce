@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // Use the provider for your database, like "postgresql", "mysql", etc.
-  url      = env("DATABASE_URL") // The URL of your database, usually provided in an environment variable
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -15,23 +15,12 @@ model User {
   createdAt   DateTime   @default(now())
 
   // Relationships
-  orders      Order[]    // One-to-many relationship with Order
-  cart        Cart?      // One-to-one relationship with Cart
-  seenProducts SeenProduct[] // One-to-many relationship with SeenProduct
-  ratings     Rating[]   // One-to-many relationship with Rating (added)
-}
-
-model Rating {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  productId  Int
-  rating     Int      // Rating value (e.g., 1 to 5)
-  createdAt  DateTime @default(now())
-
-  // Relationships
-  user       User     @relation(fields: [userId], references: [id])
-  product    Product  @relation(fields: [productId], references: [id])
-  @@unique([userId, productId])
+  orders      Order[]
+  cart        Cart?
+  seenProducts SeenProduct[]
+  ratings     Rating[]
+  comments    Comment[]
+  likes       Like[]
 }
 
 model Product {
@@ -44,26 +33,70 @@ model Product {
   inStock         Boolean     @default(true)
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
-  sizes           Size[]      // Array of available sizes
+  sizes           Size[]
   color           Color       @default(BROWN)
-  images          String[]    // Store multiple image URLs as an array
-  discountId      Int?        // Optional foreign key for Discount
-  discountedPrice Float?      // Optional discounted price
+  images          String[]
+  discountId      Int?
+  discountedPrice Float?
 
   // Relationships
-  categories      Category[]  
-  orderItems      OrderItem[] 
-  cartItems       CartItem[]  
-  seenProducts    SeenProduct[] 
-  discount        Discount?   @relation(fields: [discountId], references: [id]) 
-  ratings         Rating[]    
+  categories      Category[]
+  orderItems      OrderItem[]
+  cartItems       CartItem[]
+  seenProducts    SeenProduct[]
+  discount        Discount?   @relation(fields: [discountId], references: [id])
+  ratings         Rating[]
+  comments        Comment[]
 }
 
+model Comment {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  content   String?
+  createdAt DateTime @default(now())
+
+  // Relationships
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+  likes     Like[]
+  ratings   Rating[] // Support for comment ratings
+}
+
+model Rating {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  productId  Int?     // Nullable: Rating could be for a product or a comment
+  commentId  Int?     // Nullable: Rating could be for a comment or a product
+  rating     Int      // Rating value (e.g., 1 to 5)
+  createdAt  DateTime @default(now())
+
+  // Relationships
+  user       User     @relation(fields: [userId], references: [id])
+  product    Product? @relation(fields: [productId], references: [id]) // Nullable for comment rating
+  comment    Comment? @relation(fields: [commentId], references: [id]) // Nullable for product rating
+
+  @@check(productId IS NOT NULL OR commentId IS NOT NULL) // Ensures a rating belongs to either a product OR a comment
+  @@unique([userId, productId]) // A user can rate a product only once
+  @@unique([userId, commentId]) // A user can rate a comment only once
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  commentId Int
+
+  // Relationships
+  user      User     @relation(fields: [userId], references: [id])
+  comment   Comment  @relation(fields: [commentId], references: [id])
+
+  @@unique([userId, commentId]) // A user can like a comment only once
+}
 
 model Category {
   id        Int       @id @default(autoincrement())
   name      String    @unique
-  products  Product[] // Many-to-many relationship with Products
+  products  Product[]
 }
 
 model Discount {
@@ -74,7 +107,7 @@ model Discount {
   createdAt   DateTime  @default(now())
 
   // Relationships
-  products    Product[] // Many-to-many relationship with Products
+  products    Product[]
 }
 
 model Order {
@@ -86,7 +119,7 @@ model Order {
 
   // Relationships
   user       User       @relation(fields: [userId], references: [id])
-  items      OrderItem[] // One-to-many relationship with OrderItems
+  items      OrderItem[]
 }
 
 model OrderItem {
@@ -104,10 +137,10 @@ model OrderItem {
 model Cart {
   id       Int      @id @default(autoincrement())
   userId   Int      @unique
-  items    CartItem[] // One-to-many relationship with CartItems
+  items    CartItem[]
 
   // Relationships
-  user     User    @relation(fields: [userId], references: [id]) // One-to-one relationship with User
+  user     User    @relation(fields: [userId], references: [id])
 }
 
 model CartItem {
@@ -116,21 +149,22 @@ model CartItem {
   productId  Int
   quantity   Int
   size       Size
-  // Relationships
-  cart       Cart    @relation(fields: [cartId], references: [id]) // One-to-many relationship with Cart
-  product    Product @relation(fields: [productId], references: [id]) // One-to-many relationship with Product
   createdAt  DateTime @default(now())
+
+  // Relationships
+  cart       Cart    @relation(fields: [cartId], references: [id])
+  product    Product @relation(fields: [productId], references: [id])
 }
 
 model SeenProduct {
-  id        Int      @id @default(autoincrement()) // Unique ID for each viewed product
-  userId    Int?     // Nullable for guest users
-  productId Int      // Product being viewed
-  viewedAt  DateTime @default(now()) // Timestamp when the product was viewed
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  productId Int
+  viewedAt  DateTime @default(now())
 
   // Relationships
-  user      User?    @relation(fields: [userId], references: [id]) // Optional relation for guest views
-  product   Product  @relation(fields: [productId], references: [id]) // Required relation with Product
+  user      User?    @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
 }
 
 enum OrderStatus {

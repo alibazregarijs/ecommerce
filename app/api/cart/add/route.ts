@@ -13,8 +13,6 @@ export async function POST(req: Request) {
     }: { userId: number; productId: number; quantity: number; size: string } =
       await req.json();
 
-      console.log(userId, "userId", productId, "productId", quantity, "quantity", size, "size",quantity,"quantity");
-
     let cart = await prisma.cart.findFirst({
       where: { userId },
       include: { items: { include: { product: true } } }, // Include product details
@@ -76,7 +74,7 @@ export async function POST(req: Request) {
       size: cartItem?.size,
       quantity: cartItem?.quantity,
       product: {
-        id:cartItem?.product.id,
+        id: cartItem?.product.id,
         name: cartItem?.product.name,
         price: cartItem?.product.price,
         images: cartItem?.product.images,

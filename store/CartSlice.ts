@@ -101,7 +101,7 @@ export const updateCartItem = createAsyncThunk(
       );
 
       // API Call
-      const response = await axios.put(`/api/cart/update/${userId}`, {
+      const response = await axios.put(`/api/cart/update/`, {
         userId,
         productId,
         size,

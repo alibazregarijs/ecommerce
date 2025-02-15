@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { createSeenProduct } from "@/lib/actions/product";
 import ProductDetail from '@/components/ProductDetail';
 import { getProductDetails } from "@/lib/actions/product";
+import CommentSection from '@/components/CommentSection';
 
 
 // Define the type for searchParams
@@ -54,6 +55,7 @@ return (
         />
       ) 
     }
+    <CommentSection />
     </div>
   );
   

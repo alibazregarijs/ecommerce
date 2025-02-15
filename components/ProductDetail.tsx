@@ -29,23 +29,15 @@ const ProductDetail = ({
   const selectedSize = size || "M";
   const selectedImage = image || product.images?.[0] || "/product/default.png";
 
-  console.log(product.images, "product.images");
-
-  // Helper function to create query strings
   const createQueryString = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams as Record<string, string>);
     params.set(key, value);
     return `${pathname}?${params.toString()}`;
   };
 
-  console.log(initialQuantity, "initialQuantity");
-
-  console.log("salamsssssssssssssss");
   return (
-    <section>
-      <div className="grid place-items-center md:place-items-start mx-16 md:grid-cols-12 gap-2 grid-cols-1 md:grid-rows-3 md:gap-4">
-        {/* Image Selector */}
-        {/* Image Selector */}
+   
+      <div className="grid place-items-center md:place-items-start mx-16 md:grid-cols-12 gap-2 grid-cols-1 md:gap-4">
         <div className="md:col-span-2 md:grid flex justify-center items-center col-span-12 space-x-3 md:space-y-3 md:order-1 order-2">
           {product.images.map((img, index) => (
             <Link key={index} href={createQueryString("image", img)}>
@@ -76,7 +68,7 @@ const ProductDetail = ({
         </div>
 
         {/* Product Details */}
-        <div className="md:col-span-6 w-full col-span-12 md:order-3 order-3">
+        <div className="md:col-span-6  w-full col-span-12 md:order-3 order-3">
           <Product product={product} productDetail={true} userId={userId} />
           <div className="border bottom-1 border-gray-200 w-full mt-10"></div>
 
@@ -141,7 +133,7 @@ const ProductDetail = ({
           </div>
         </div>
       </div>
-    </section>
+  
   );
 };
 
