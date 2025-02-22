@@ -1,17 +1,32 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Comment from "@/components/Comment";
-import { useCommentSelector } from "@/store/hook";
+import { useCommentSelector, useCommentDispatch } from "@/store/hook";
+import { fetchComments } from "@/store/CommentSlice";
+import Spinner from "@/components/Spinner";
 
-
-const ListingComment = () => {
+const ListingComment = ({
+  userId,
+  productId,
+}: {
+  userId: number;
+  productId: number;
+}) => {
+  const dispatch = useCommentDispatch();
   const comments = useCommentSelector((state) => state.comments.comments);
-  console.log(comments,"reducer comment");
+  const loading = useCommentSelector((state) => state.comments.loading);
+
+
+  useEffect(() => {
+    dispatch(fetchComments({ productId, userId }));
+  }, [dispatch, userId]);
+
+  if (loading) return <Spinner loading={true} />;
   return (
     <div className="grid grid-cols-12 gap-2 mx-4 md:mx-16 mt-8">
       {comments &&
         comments.map((comment, index) => (
-          <Comment comment={comment} key={index} />
+          <Comment comment={comment} productId={productId} key={index} userId={userId} />
         ))}
     </div>
   );

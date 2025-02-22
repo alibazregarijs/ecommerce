@@ -73,7 +73,7 @@ const CommentSection = ({
       </div>
 
       {/* Listing Comment */}
-      <ListingCommnet />
+      <ListingCommnet userId={userId} productId={productId} />
       {isAddCommentBtnClicked && (
         <AddCommentModal
           isAddCommentBtnClicked={isAddCommentBtnClicked}

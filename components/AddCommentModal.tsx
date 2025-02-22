@@ -50,10 +50,7 @@ const CommentModal = ({
     dispatch(
       createCommentOptimistically({
         tempId: Math.floor(Math.random() * 10000), // Temporary ID
-        userId: {
-          id: userId,
-          name: username,
-        },
+        name: username,
         productId,
         content: comment,
       })
