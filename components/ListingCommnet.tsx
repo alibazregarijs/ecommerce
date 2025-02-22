@@ -16,7 +16,6 @@ const ListingComment = ({
   const comments = useCommentSelector((state) => state.comments.comments);
   const loading = useCommentSelector((state) => state.comments.loading);
 
-
   useEffect(() => {
     dispatch(fetchComments({ productId, userId }));
   }, [dispatch, userId]);
@@ -26,7 +25,12 @@ const ListingComment = ({
     <div className="grid grid-cols-12 gap-2 mx-4 md:mx-16 mt-8">
       {comments &&
         comments.map((comment, index) => (
-          <Comment comment={comment} productId={productId} key={index} userId={userId} />
+          <Comment
+            comment={comment}
+            productId={productId}
+            key={index}
+            userId={userId}
+          />
         ))}
     </div>
   );

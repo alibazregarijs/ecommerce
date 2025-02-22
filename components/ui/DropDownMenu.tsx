@@ -11,19 +11,37 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import { memo, useState } from "react";
+import AddCommentModal from "@/components/AddCommentModal";
 
 const DropDownMenu = ({
   option,
   setOption,
   comment = true,
+  commentObject,
+  userId,
+  productId,
 }: {
   option: string;
   setOption: React.Dispatch<React.SetStateAction<string>>;
   comment?: boolean;
-  commentOption?: boolean;
-  setCommentOption?: React.Dispatch<React.SetStateAction<boolean>>;
+  commentObject?: any;
+  userId?: number;
+  productId?: number;
 }) => {
   const [commentOption, setCommentOption] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false); // Control modal visibility
+
+  // Handle selection and modal opening
+  const handleSelect = (value: string) => {
+    setOption(value);
+    setCommentOption(false); // Close dropdown
+    if (value === "edit") {
+      setEditModalOpen(true); // Open modal on "Edit"
+    }
+  };
+
+  console.log(commentObject, "commentObject in dropdwon");
+
 
   return (
     <div>
@@ -37,7 +55,6 @@ const DropDownMenu = ({
                 alt="tick"
                 width={20}
                 height={20}
-                onClick={() => setCommentOption?.(!commentOption)}
               />
             ) : (
               <Button variant="outline">
@@ -53,32 +70,27 @@ const DropDownMenu = ({
         <DropdownMenuContent className="w-56 bg-black text-white" align="end">
           <DropdownMenuLabel>Sort by</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuRadioGroup value={option} onValueChange={setOption}>
+          <DropdownMenuRadioGroup value={option} onValueChange={handleSelect}>
             <DropdownMenuRadioItem
-              value={comment ? "edit" : "newest"}
-              className={`cursor-pointer ${
-                comment &&
-                "bg-white text-black hover:!bg-white hover:!text-black"
-              }`}
+              value="edit"
+              className="cursor-pointer bg-white text-black hover:!bg-white hover:!text-black"
             >
-              {comment ? "Edit" : "New"}
+              Edit
             </DropdownMenuRadioItem>
             <DropdownMenuRadioItem
-                value={comment ? "Delete" : "Highest"}
-              className={`cursor-pointer ${
-                comment && "bg-red-500 text-white hover:!bg-red-500"
-              }`}
+              value="Delete"
+              className="cursor-pointer bg-red-500 text-white hover:!bg-red-500"
             >
-              {comment ? "Delete" : "Highest Price"}
+              Delete
             </DropdownMenuRadioItem>
-            {!comment && (
-              <DropdownMenuRadioItem value="lowest" className="cursor-pointer">
-                Lowest Rating
-              </DropdownMenuRadioItem>
-            )}
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* Open modal only when "Edit" is selected */}
+      {isEditModalOpen && (
+        <AddCommentModal edit={true} setEdit={setEditModalOpen} commentObject={commentObject} userId={userId} productId={productId} />
+      )}
     </div>
   );
 };

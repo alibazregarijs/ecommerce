@@ -23,7 +23,6 @@ export async function POST(req: NextRequest) {
     // If no last product found, return an empty array
     if (!lastProduct) {
       const fetchProducts = await axios.get<ProductProps[]>(`http://localhost:3000/api/product/all?limit=${limit}`);
-      console.log("Fetched Products:", fetchProducts.data);
       return NextResponse.json(fetchProducts.data, { status: 200 });
     }
     
@@ -39,8 +38,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    console.log("Last Product Categories:", product.categories);
-    console.log("Product Name:", product.name);
+
 
     // Fetch related products based on the current product
     const relatedProducts = await prisma.product.findMany({
@@ -72,7 +70,7 @@ export async function POST(req: NextRequest) {
       take: limit,
     });
 
-    console.log("Related Products:", relatedProducts);
+ 
 
     // If no related products, return fallback products
 

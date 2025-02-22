@@ -15,6 +15,9 @@ export async function GET(req: Request) {
       where: {
         id: productId,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
       include: {
         comments: true,
         ratings: {

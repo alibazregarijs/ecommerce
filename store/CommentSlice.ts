@@ -72,7 +72,7 @@ export const createComment = createAsyncThunk(
       productId: number;
       content: string;
     },
-    { rejectWithValue }
+    { rejectWithValue } 
   ) => {
     try {
       const response = await axios.post("/api/comment/add", {
@@ -80,7 +80,7 @@ export const createComment = createAsyncThunk(
         productId,
         content,
       });
-      console.log(response.data, "comment");
+
       return response.data; // Return the newly created comment
     } catch (error) {
       if (error instanceof Error) {
@@ -96,14 +96,45 @@ export const fetchComments = createAsyncThunk(
     { productId, userId }: { productId: number; userId: number },
     { rejectWithValue }
   ) => {
-    console.log(productId, "productId", userId, "userId");
+
     try {
       const response = await axios.get(`/api/comment/${userId}/${productId}`);
-      console.log(response.data, "commentsssssssssss");
+   
       return response.data; // Ensure the response is an array
     } catch (error) {
       if (error instanceof Error) {
         return rejectWithValue(error.message || "Failed to fetch comments");
+      }
+    }
+  }
+);
+
+export const updateComment = createAsyncThunk(
+  "comment/createComment",
+  async (
+    {
+      userId,
+      commentId,
+      content,
+    }: {
+      userId: number;
+      commentId: number;
+      content: string;
+    },
+    { rejectWithValue } 
+  ) => {
+    try {
+      console.log(userId, commentId, content, "commentId");
+      const response = await axios.put("/api/comment/content", {
+        userId,
+        commentId,
+        content,
+      });
+
+      return response.data; // Return the newly created comment
+    } catch (error) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message || "Failed to create comment");
       }
     }
   }
@@ -128,14 +159,13 @@ export const commentSlice = createSlice({
 
       state.pendingComments[tempId] = true; // Mark comment as pending
 
-      state.comments.push({
+      state.comments.unshift({ // Add new comment at the beginning of the array
         id: tempId, // Temporary ID until backend assigns real one
         name,
         productId,
         content,
         createdAt: new Date().toISOString(),
       });
-      console.log(state.comments, "reducer comment");
     },
 
     rateCommentOptimistically: (
@@ -148,9 +178,6 @@ export const commentSlice = createSlice({
     ) => {
       const { productId, commentId, rating } = action.payload;
 
-      state.comments.map((comment) => {
-        console.log(comment.id, "comment.id");
-      });
       // Find the comment in the state
       const commentIndex = state.comments.findIndex(
         (comment) => comment.id === commentId && comment.productId === productId
@@ -160,6 +187,30 @@ export const commentSlice = createSlice({
         const updatedComment = {
           ...state.comments[commentIndex],
           rating: rating,
+        };
+
+        state.comments[commentIndex] = updatedComment;
+      }
+    },
+
+    updateCommentOptimistically: (
+      state,
+      action: PayloadAction<{
+        commentId: number;
+        content: string;
+      }>
+    ) => {
+      const { commentId, content } = action.payload;
+
+      // Find the comment in the state
+      const commentIndex = state.comments.findIndex(
+        (comment) => comment.id === commentId
+      );
+
+      if (commentIndex !== -1) {
+        const updatedComment = {
+          ...state.comments[commentIndex],
+          content,
         };
 
         state.comments[commentIndex] = updatedComment;
@@ -211,6 +262,6 @@ export const commentSlice = createSlice({
   },
 });
 
-export const { createCommentOptimistically, rateCommentOptimistically } =
+export const { createCommentOptimistically, rateCommentOptimistically , updateCommentOptimistically } =
   commentSlice.actions;
 export default commentSlice.reducer;

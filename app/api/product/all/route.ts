@@ -3,10 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
   const limit = req.nextUrl.searchParams.get('limit'); // Get limit from query params
-  console.log(limit,"limit")
+
     const limitNumber = limit ? parseInt(limit) : 4;
 
-    console.log(limit)
+
   try {
     const productsWithDiscountsAndRatings = await prisma.product.findMany({
       include: {

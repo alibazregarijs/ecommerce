@@ -4,12 +4,14 @@ import { prisma } from "@/lib/prisma"; // Adjust the import based on your setup
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    let { userId, commentId, rating } = body;
+    let { userId, commentId, content } = body;
+    console.log(userId, commentId, content, "commentId");
     userId = Number(userId);
+
     commentId = Number(commentId);
 
     // Validate input
-    if (!userId || !commentId || !rating) {
+    if (!userId || !commentId || !content) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }
@@ -17,21 +19,18 @@ export async function PUT(req: NextRequest) {
     }
 
     // Create comment in the database
-    const newComment = await prisma.rating.upsert({
-      where: { userId_commentId: { userId, commentId } },
-      create: {
-        userId,
-        commentId,
-        rating,
+    const newComment = await prisma.comment.update({
+      where: { id: commentId },
+      data: {
+        content,
       },
-      update: {
-        rating,
-      },
+      
     });
 
+    console.log(newComment, "newComment");
     return NextResponse.json(newComment, { status: 201 });
   } catch (error) {
-    console.error("Error creating comment:", error);
+    console.error("Error updating comment:", error);
     return NextResponse.json(
       {
         message: "Internal server error",

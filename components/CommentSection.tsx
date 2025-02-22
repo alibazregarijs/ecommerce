@@ -22,8 +22,6 @@ const CommentSection = ({
     setActiveTab(tab);
   };
 
-  console.log(filter, "filter");
-
   return (
     <>
       <div className="flex px-4 md:px-16 mt-20 justify-around items-center w-full rounded-t-[20px] bg-white border-b-1 border-gray-200">

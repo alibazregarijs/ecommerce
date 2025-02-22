@@ -15,6 +15,9 @@ export async function GET(
       where: {
         productId: productId, // Filter comments by productId
       },
+      orderBy: {
+        createdAt: "desc",
+      },
       include: {
         user: {
           select: {
@@ -42,7 +45,6 @@ export async function GET(
       productId: comment.productId,
     }));
 
-    console.log(modifiedComments, "modifiedComments");
     return NextResponse.json(modifiedComments);
   } catch (error) {
     console.error("Error fetching comments:", error);
