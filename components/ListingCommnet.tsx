@@ -14,13 +14,16 @@ const ListingComment = ({
 }) => {
   const dispatch = useCommentDispatch();
   const comments = useCommentSelector((state) => state.comments.comments);
-  const loading = useCommentSelector((state) => state.comments.loading);
+  const fetchLoading = useCommentSelector(
+    (state) => state.comments.loading
+  ); // Track initial fetching
 
   useEffect(() => {
     dispatch(fetchComments({ productId, userId }));
-  }, [dispatch, userId]);
+  }, [dispatch, userId, productId]); // Ensure productId is also in dependencies
 
-  if (loading) return <Spinner loading={true} />;
+  if (fetchLoading) return <Spinner loading={true} />; // Show spinner only on first load
+
   return (
     <div className="grid grid-cols-12 gap-2 mx-4 md:mx-16 mt-8">
       {comments &&

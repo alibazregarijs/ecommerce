@@ -25,7 +25,7 @@ type CommentState = {
 
 const initialState: CommentState = {
   comments: [],
-  loading: false,
+  loading: false, // Change this to track only specific actions
   error: null,
   pendingComments: {},
 };
@@ -72,7 +72,7 @@ export const createComment = createAsyncThunk(
       productId: number;
       content: string;
     },
-    { rejectWithValue } 
+    { rejectWithValue }
   ) => {
     try {
       const response = await axios.post("/api/comment/add", {
@@ -96,10 +96,9 @@ export const fetchComments = createAsyncThunk(
     { productId, userId }: { productId: number; userId: number },
     { rejectWithValue }
   ) => {
-
     try {
       const response = await axios.get(`/api/comment/${userId}/${productId}`);
-   
+
       return response.data; // Ensure the response is an array
     } catch (error) {
       if (error instanceof Error) {
@@ -121,7 +120,7 @@ export const updateComment = createAsyncThunk(
       commentId: number;
       content: string;
     },
-    { rejectWithValue } 
+    { rejectWithValue }
   ) => {
     try {
       console.log(userId, commentId, content, "commentId");
@@ -159,7 +158,8 @@ export const commentSlice = createSlice({
 
       state.pendingComments[tempId] = true; // Mark comment as pending
 
-      state.comments.unshift({ // Add new comment at the beginning of the array
+      state.comments.unshift({
+        // Add new comment at the beginning of the array
         id: tempId, // Temporary ID until backend assigns real one
         name,
         productId,
@@ -221,7 +221,7 @@ export const commentSlice = createSlice({
     builder
       // Create Comment
       .addCase(createComment.pending, (state) => {
-        state.loading = true;
+        state.loading = false;
         state.error = null;
       })
       .addCase(
@@ -245,23 +245,26 @@ export const commentSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(fetchComments.pending, (state) => {
-        state.loading = true;
+        state.loading = true; // Show spinner only on the first fetch
         state.error = null;
       })
       .addCase(
         fetchComments.fulfilled,
         (state, action: PayloadAction<Comment[]>) => {
-          state.loading = false;
-          state.comments = action.payload; // Update the state with fetched comments
+          state.loading = false; // Stop showing spinner after first fetch
+          state.comments = action.payload;
         }
       )
       .addCase(fetchComments.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string; // Set error message
+        state.error = action.payload as string;
       });
   },
 });
 
-export const { createCommentOptimistically, rateCommentOptimistically , updateCommentOptimistically } =
-  commentSlice.actions;
+export const {
+  createCommentOptimistically,
+  rateCommentOptimistically,
+  updateCommentOptimistically,
+} = commentSlice.actions;
 export default commentSlice.reducer;
