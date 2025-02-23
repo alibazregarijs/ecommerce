@@ -93,11 +93,12 @@ export const createComment = createAsyncThunk(
 export const fetchComments = createAsyncThunk(
   "comment/fetchComments",
   async (
-    { productId, userId }: { productId: number; userId: number },
+    { productId, userId , newest }: { productId: number; userId: number ,newest: boolean },
     { rejectWithValue }
   ) => {
+    console.log(productId, userId, newest , "productId");
     try {
-      const response = await axios.get(`/api/comment/${userId}/${productId}`);
+      const response = await axios.get(`/api/comment/${userId}/${productId}/?newest=${newest}`);
 
       return response.data; // Ensure the response is an array
     } catch (error) {

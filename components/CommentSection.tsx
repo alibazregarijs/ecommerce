@@ -1,9 +1,11 @@
 "use client";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Button } from "./ui/button";
 import DropDownMenu from "@/components/ui/DropDownMenu";
 import ListingCommnet from "@/components/ListingCommnet";
 import AddCommentModal from "@/components/AddCommentModal";
+import { useCommentDispatch, useCommentSelector } from "@/store/hook";
+import { fetchComments } from "@/store/CommentSlice";
 
 const CommentSection = ({
   productId,
@@ -17,6 +19,18 @@ const CommentSection = ({
   const [filter, setFilter] = useState("newest");
   const [activeTab, setActiveTab] = useState("reviews");
   const [isAddCommentBtnClicked, setAddCommentBtnClicked] = useState(false);
+
+  const dispatch = useCommentDispatch();
+  const comments = useCommentSelector((state) => state.comments.comments);
+  const [page, setPage] = useState(1);
+  const fetchLoading = useCommentSelector((state) => state.comments.loading); // Track initial fetching
+  const modifiedComments = comments.slice(0, page * 4);
+
+  let newest = filter === "newest" ? true : false;
+
+  useEffect(() => {
+    dispatch(fetchComments({ productId, userId, newest: newest }));
+  }, [dispatch, userId, productId, newest]); // Ensure productId is also in dependencies
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
@@ -59,6 +73,8 @@ const CommentSection = ({
               option={filter}
               setOption={setFilter}
               comment={false}
+              userId={userId}
+              productId={productId}
             />
           </div>
           <Button
@@ -71,7 +87,14 @@ const CommentSection = ({
       </div>
 
       {/* Listing Comment */}
-      <ListingCommnet userId={userId} productId={productId} />
+      <ListingCommnet
+        userId={userId}
+        productId={productId}
+        comments={modifiedComments}
+        fetchLoading={fetchLoading}
+      />
+
+      {/* Adding  Comment  */}
       {isAddCommentBtnClicked && (
         <AddCommentModal
           isAddCommentBtnClicked={isAddCommentBtnClicked}
@@ -80,6 +103,18 @@ const CommentSection = ({
           userId={userId}
           username={username}
         />
+      )}
+      {/* Load More Button */}
+      {modifiedComments.length !== comments.length && (
+        <div className="flex justify-center items-center md:mx-16 mt-8">
+          <Button
+            disabled={modifiedComments.length == comments.length}
+            onClick={() => setPage((prev) => prev + 1)}
+            className="bg-black text-white hover:!bg-black"
+          >
+            Load More
+          </Button>
+        </div>
       )}
     </>
   );

@@ -10,7 +10,7 @@ export async function PUT(req: NextRequest) {
 
     commentId = Number(commentId);
 
-    console.log("salam in content")
+    console.log("salam in content");
 
     // Validate input
     if (!userId || !commentId) {
@@ -26,7 +26,6 @@ export async function PUT(req: NextRequest) {
       data: {
         content,
       },
-      
     });
 
     console.log(newComment, "newComment");

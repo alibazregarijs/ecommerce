@@ -3,11 +3,16 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  props: { params: Promise<{ userId: string; productId: string }> }
+  props: {
+    params: Promise<{ userId: string; productId: string; newest: boolean }>;
+  }
 ) {
   const params = await props.params;
   const userId = Number(params.userId);
   const productId = Number(params.productId);
+
+  const searchParams = new URL(request.url).searchParams; // Get query parameters
+  const newest = searchParams.get("newest") === "true"; // Convert string to boolean
 
   try {
     // Fetch comments for the product, including the user's fullName and their rating
@@ -19,7 +24,7 @@ export async function GET(
         },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: newest ? "desc" : "asc",
       },
       include: {
         user: {
