@@ -216,6 +216,24 @@ export const commentSlice = createSlice({
         state.comments[commentIndex] = updatedComment;
       }
     },
+
+    deleteCommentOptimistically: (
+      state,
+      action: PayloadAction<{
+        commentId: number;
+      }>
+    ) => {
+      const { commentId } = action.payload;
+
+      // Find the comment in the state
+      const commentIndex = state.comments.findIndex(
+        (comment) => comment.id === commentId
+      );
+
+      if (commentIndex !== -1) {
+        state.comments.splice(commentIndex, 1);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -266,5 +284,6 @@ export const {
   createCommentOptimistically,
   rateCommentOptimistically,
   updateCommentOptimistically,
+  deleteCommentOptimistically,
 } = commentSlice.actions;
 export default commentSlice.reducer;

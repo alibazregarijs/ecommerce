@@ -10,8 +10,10 @@ export async function PUT(req: NextRequest) {
 
     commentId = Number(commentId);
 
+    console.log("salam in content")
+
     // Validate input
-    if (!userId || !commentId || !content) {
+    if (!userId || !commentId) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }

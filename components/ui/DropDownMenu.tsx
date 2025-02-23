@@ -12,6 +12,8 @@ import {
 import Image from "next/image";
 import { memo, useState } from "react";
 import AddCommentModal from "@/components/AddCommentModal";
+import { useCommentDispatch } from "@/store/hook";
+import { updateComment , deleteCommentOptimistically} from "@/store/CommentSlice";
 
 const DropDownMenu = ({
   option,
@@ -30,6 +32,7 @@ const DropDownMenu = ({
 }) => {
   const [commentOption, setCommentOption] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false); // Control modal visibility
+  const dispatch = useCommentDispatch();
 
   // Handle selection and modal opening
   const handleSelect = (value: string) => {
@@ -38,9 +41,13 @@ const DropDownMenu = ({
     if (value === "edit") {
       setEditModalOpen(true); // Open modal on "Edit"
     }
+    else if (value === "Delete") {
+      dispatch(deleteCommentOptimistically({ commentId: commentObject.id }));
+      dispatch(updateComment({ userId: Number(userId), commentId: commentObject.id, content: "" }));
+    }
   };
 
-  console.log(commentObject, "commentObject in dropdwon");
+
 
 
   return (

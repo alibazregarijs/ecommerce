@@ -14,6 +14,9 @@ export async function GET(
     const comments = await prisma.comment.findMany({
       where: {
         productId: productId, // Filter comments by productId
+        content: {
+          not: "", // Exclude comments where content is an empty string
+        },
       },
       orderBy: {
         createdAt: "desc",
