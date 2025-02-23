@@ -3,14 +3,12 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: Request) {
   const body = await req.json();
 
-  let { userId, productId , newest } = body;
+  let { userId, productId } = body;
   if (!userId || !productId) {
     return new Response("Missing required fields", { status: 400 });
   }
   userId = Number(userId);
   productId = Number(productId);
-
-  console.log( newest ? "desc" : "asc")
 
   try {
     const comments = await prisma.product.findMany({
@@ -18,7 +16,7 @@ export async function GET(req: Request) {
         id: productId,
       },
       orderBy: {
-        createdAt: newest ? "desc" : "asc",
+        createdAt: "desc",
       },
       include: {
         comments: true,
