@@ -1,8 +1,8 @@
 import React from "react";
 
-const StarIconSvg = ({i}:{i:number}) => {
+const StarIconSvg = ({i , empty}: {i: number, empty?: boolean}) => {
   return (
-    <div>
+    <div className={`${!empty ? "cursor-pointer" : ""}`}>
       <svg
         key={i}
         width="25"

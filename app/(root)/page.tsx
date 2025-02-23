@@ -2,15 +2,21 @@ import React from "react";
 import Navbar from "@/components/Navbar";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import DifferentDress from "@/components/DifferentDress";
 import Footer from "@/components/Footer";
-const page = () => {
+import { auth } from "@/auth";
+
+const page = async () => {
+
+  const session = await auth();
+  const userId = session?.user?.id;
+
+
   return (
     <>
-      <Navbar />
+      
       <Header />
-      <Hero />
-      <Footer/>
+      <Hero  userId={userId as string} />
+   
     </>
   );
 };

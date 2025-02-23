@@ -1,59 +1,84 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import ListingProduct from "@/components/ListingProduct";
 import DifferentDress from "@/components/DifferentDress";
 import Slider from "@/components/Slider";
 import UpToDate from "@/components/UpToDate";
-const Hero = () => {
-  const slides = [
-    {
-      id: 1,
-      name: "Sara M",
-      description: `Sarah M. I'm blown away by the quality and style of the clothes I received from Shop.co. From casual wear to elegant dresses, every piece I've bought has exceeded my expectations.”`,
-      rating: 4.5,
-    },
-    {
-      id: 2,
-      name: "Alex K",
-      description: `Alex K.
-"Finding clothes that align with my personal style used to be a challenge until I discovered Shop.co. The range of options they offer is truly remarkable, catering to a variety of tastes and occasions.”`,
-      rating: 2.5,
-    },
-    {
-      id: 3,
-      name: "John D",
-      description: `"As someone who's always on the lookout for unique fashion pieces, I'm thrilled to have stumbled upon Shop.co. The selection of clothes is not only diverse but also on-point with the latest trends.”`,
-      rating: 5,
-    },
-    {
-      id: 4,
-      name: "James L",
-      description: `"Shop.co has been a lifesaver for me. Their selection of clothes is always fresh and stylish, and their customer service is top-notch. I highly recommend them to anyone looking for quality fashion.”`,
-      rating: 1.5,
-    },
-    {
-      id: 5,
-      name: "Saeed M",
-      description: `"As someone who's always on the lookout for unique fashion pieces, I'm thrilled to have stumbled upon Shop.co. The selection of clothes is not only diverse but also on-point with the latest trends.”`,
-      rating: 2,
-    },
-  ];
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store/store";
+import { fetchProducts, fetchRelatedProducts } from "@/store/ProductSlice";
+import Spinner from "@/components/Spinner";
+import { SLIEDS } from "@/constants";
+
+const Hero = ({ userId }: { userId: string }) => {
+  const [viewAllNewArrival, setViewAllNewArrival] = useState(2);
+  const [viewAllRelated, setViewAllRelated] = useState(2);
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  const mainProducts = useSelector(
+    (state: RootState) => state.products.mainProducts
+  );
+  const relatedProducts = useSelector(
+    (state: RootState) => state.products.relatedProducts
+  );
+  const mainProductsLoading = useSelector(
+    (state: RootState) => state.products.mainProductsLoading
+  );
+  const relatedProductsLoading = useSelector(
+    (state: RootState) => state.products.relatedProductsLoading
+  );
+
+  useEffect(() => {
+    dispatch(fetchProducts(viewAllNewArrival));
+  }, [dispatch, viewAllNewArrival]);
+
+  useEffect(() => {
+    dispatch(
+      fetchRelatedProducts({ userId: Number(userId), limit: viewAllRelated })
+    );
+  }, [dispatch, userId, viewAllRelated]);
+
   return (
     <div className="flex flex-col justify-center items-center mt-[72px]">
-      <h1 className="font-extrabold text-3xl">New Arrivals</h1>
-      <div className="flex justify-center items-center space-x-4 mt-[56px]">
-        <ListingProduct />
-      </div>
+      {mainProductsLoading ? (
+        <Spinner loading={true} />
+      ) : (
+        <React.Fragment>
+          <h1 className="font-extrabold text-3xl">New Arrivals</h1>
+          <ListingProduct
+            userId={Number(userId)}
+            products={mainProducts}
+            setViewAll={setViewAllNewArrival}
+          />
+        </React.Fragment>
+      )}
+
+      {relatedProductsLoading ? (
+        <Spinner loading={true} />
+      ) : (
+        <React.Fragment>
+          <h1 className="font-extrabold text-3xl mt-16">
+            You Might Also Like{" "}
+          </h1>
+          <ListingProduct
+            userId={Number(userId)}
+            products={relatedProducts}
+            setViewAll={setViewAllRelated}
+          />
+        </React.Fragment>
+      )}
 
       <div className="flex justify-center lg:max-w-screen-xl md:max-w-screen-md rounded-[40px] w-full mt-[80px] bg-[#F0F0F0]">
         <DifferentDress />
       </div>
 
-       <div className="flex justify-center w-full items-center mt-[80px]"> 
-        <Slider slides={slides} />
+      <div className="flex justify-center w-full items-center mt-[80px]">
+        <Slider slides={SLIEDS} />
       </div>
       <div className="flex justify-center items-center mt-[80px] w-full">
         <UpToDate />
-      </div> 
+      </div>
     </div>
   );
 };

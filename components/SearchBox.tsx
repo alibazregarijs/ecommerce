@@ -13,7 +13,6 @@ export const Searchbox = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Searching for:", query);
   };
 
   return (
